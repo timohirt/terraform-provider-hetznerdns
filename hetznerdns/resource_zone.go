@@ -74,6 +74,7 @@ func resourceZoneRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceZoneUpdate(d *schema.ResourceData, m interface{}) error {
+	log.Printf("[DEBUG] Updating resource zone")
 	client := m.(*api.Client)
 	zoneID := d.Id()
 	zone, err := client.GetZone(zoneID)
