@@ -10,11 +10,13 @@ import (
 
 func resourceZone() *schema.Resource {
 	return &schema.Resource{
-		Create:   resourceZoneCreate,
-		Read:     resourceZoneRead,
-		Update:   resourceZoneUpdate,
-		Delete:   resourceZoneDelete,
-		Importer: nil,
+		Create: resourceZoneCreate,
+		Read:   resourceZoneRead,
+		Update: resourceZoneUpdate,
+		Delete: resourceZoneDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {

@@ -29,6 +29,16 @@ The following arguments are supported:
 
 - `ttl` - (Required, int) Time to live of this zone.
 
+#### Import
+
+A Zone can be imported using its `id`. Log in to the Hetzner DNS web frontend,
+navigate to the zone you want to import, and copy the id from the URL in your
+browser.
+
+```
+terraform import hetznerdns_zone.zone1 <id>
+```
+
 ## Data Sources
 
 ### hetznerdns_zone
