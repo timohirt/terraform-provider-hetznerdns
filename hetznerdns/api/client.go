@@ -241,6 +241,8 @@ func (c *Client) GetRecord(recordID string) (*Record, error) {
 		}
 
 		return &response.Record, nil
+	} else if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
 	}
 
 	return nil, fmt.Errorf("Error getting Record. HTTP status %d unhandled", resp.StatusCode)
@@ -274,4 +276,17 @@ func (c *Client) CreateRecord(opts CreateRecordOpts) (*Record, error) {
 	}
 
 	return nil, fmt.Errorf("Error creating Record. HTTP status %d unhandled", resp.StatusCode)
+}
+
+// DeleteRecord deletes a given record
+func (c *Client) DeleteRecord(id string) error {
+	resp, err := c.doDeleteRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/records/%s", id))
+	if err != nil {
+		return fmt.Errorf("Error deleting zone %s: %s", id, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+	return fmt.Errorf("Error deleting Record. HTTP status %d unhandled", resp.StatusCode)
 }

@@ -124,14 +124,14 @@ func resourceRecordUpdate(d *schema.ResourceData, m interface{}) error {
 func resourceRecordDelete(d *schema.ResourceData, m interface{}) error {
 	log.Printf("[DEBUG] Deleting resource record")
 
-	//client := m.(*api.Client)
-	/*zoneID := d.Id()
+	client := m.(*api.Client)
+	recordID := d.Id()
 
-	err := client.DeleteZone(zoneID)
+	err := client.DeleteRecord(recordID)
 	if err != nil {
-		log.Printf("[ERROR] Error deleting zone %s: %s", zoneID, err)
+		log.Printf("[ERROR] Error deleting record %s: %s", recordID, err)
 		return err
-	}*/
+	}
 
 	return nil
 }

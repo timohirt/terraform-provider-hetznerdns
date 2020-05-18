@@ -87,10 +87,20 @@ func TestClientGetRecord(t *testing.T) {
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
 	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
 
-	zone, err := client.GetRecord("12345678")
+	record, err := client.GetRecord("12345678")
 
 	assert.NoError(t, err)
-	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}, *zone)
+	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}, *record)
+}
+
+func TestClientGetRecordReturnNilIfNotFound(t *testing.T) {
+	config := RequestConfig{responseHTTPStatus: http.StatusNotFound}
+	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+
+	record, err := client.GetRecord("irrelevant")
+
+	assert.NoError(t, err)
+	assert.Nil(t, record)
 }
 
 func TestClientCreateRecordSuccess(t *testing.T) {
@@ -107,6 +117,15 @@ func TestClientCreateRecordSuccess(t *testing.T) {
 	assert.NotNil(t, requestBodyReader, "The request body should not be nil")
 	jsonRequestBody, _ := ioutil.ReadAll(requestBodyReader)
 	assert.Equal(t, `{"zone_id":"wwwlsksjjenm","type":"A","name":"zone1.online","value":"192.168.1.1","ttl":3600}`, string(jsonRequestBody))
+}
+
+func TestClientRecordZone(t *testing.T) {
+	config := RequestConfig{responseHTTPStatus: http.StatusOK}
+	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+
+	err := client.DeleteRecord("irrelevant")
+
+	assert.NoError(t, err)
 }
 
 type RequestConfig struct {
