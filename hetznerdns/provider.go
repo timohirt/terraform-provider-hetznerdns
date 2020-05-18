@@ -18,7 +18,8 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"hetznerdns_zone": resourceZone(),
+			"hetznerdns_zone":   resourceZone(),
+			"hetznerdns_record": resourceRecord(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"hetznerdns_zone": dataSourceHetznerDNSZone(),

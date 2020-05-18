@@ -82,6 +82,33 @@ func TestClientDeleteZone(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestClientGetRecord(t *testing.T) {
+	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","name":"zone1.online","ttl":3600,"type":"A","value":"192.168.1.1"}}`)
+	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
+	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+
+	zone, err := client.GetRecord("12345678")
+
+	assert.NoError(t, err)
+	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}, *zone)
+}
+
+func TestClientCreateRecordSuccess(t *testing.T) {
+	var requestBodyReader io.Reader
+	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","name":"zone1.online","ttl":3600,"type":"A","value":"192.168.1.1"}}`)
+	config := RequestConfig{responseHTTPStatus: http.StatusOK, requestBodyReader: &requestBodyReader, responseBodyJSON: responseBody}
+	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+
+	opts := CreateRecordOpts{ZoneID: "wwwlsksjjenm", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}
+	record, err := client.CreateRecord(opts)
+
+	assert.NoError(t, err)
+	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}, *record)
+	assert.NotNil(t, requestBodyReader, "The request body should not be nil")
+	jsonRequestBody, _ := ioutil.ReadAll(requestBodyReader)
+	assert.Equal(t, `{"zone_id":"wwwlsksjjenm","type":"A","name":"zone1.online","value":"192.168.1.1","ttl":3600}`, string(jsonRequestBody))
+}
+
 type RequestConfig struct {
 	responseHTTPStatus int
 	responseBodyJSON   []byte

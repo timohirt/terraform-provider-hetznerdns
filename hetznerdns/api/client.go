@@ -105,7 +105,7 @@ func (c *Client) GetZone(id string) (*Zone, error) {
 		return &response.Zone, nil
 	}
 
-	return nil, fmt.Errorf("Error getting Zone. HTTP status %d unhandeled", resp.StatusCode)
+	return nil, fmt.Errorf("Error getting Zone. HTTP status %d unhandled", resp.StatusCode)
 }
 
 // UpdateZone takes the passed state and updates the respective Zone
@@ -137,7 +137,7 @@ func (c *Client) DeleteZone(id string) error {
 	if resp.StatusCode == http.StatusOK {
 		return nil
 	}
-	return fmt.Errorf("Error deleting Zone. HTTP status %d unhandeled", 400)
+	return fmt.Errorf("Error deleting Zone. HTTP status %d unhandled", resp.StatusCode)
 }
 
 // GetZoneByName reads the current state of a DNS zone with a given name
@@ -161,13 +161,13 @@ func (c *Client) GetZoneByName(name string) (*Zone, error) {
 		return &response.Zones[0], nil
 	}
 
-	return nil, fmt.Errorf("Error getting Zone. HTTP status %d unhandeled", resp.StatusCode)
+	return nil, fmt.Errorf("Error getting Zone. HTTP status %d unhandled", resp.StatusCode)
 }
 
 // CreateZoneOpts covers all parameters used to create a new DNS zone
 type CreateZoneOpts struct {
-	Name string
-	TTL  int
+	Name string `json:"name"`
+	TTL  int    `json:"ttl"`
 }
 
 // CreateZone creates a new DNS zone
@@ -193,5 +193,85 @@ func (c *Client) CreateZone(opts CreateZoneOpts) (*Zone, error) {
 		return &response.Zone, nil
 	}
 
-	return nil, fmt.Errorf("Error creating Zone. HTTP status %d unhandeled", resp.StatusCode)
+	return nil, fmt.Errorf("Error creating Zone. HTTP status %d unhandled", resp.StatusCode)
+}
+
+// GetRecordByName reads the current state of a DNS Record with a given name and zone id
+func (c *Client) GetRecordByName(zoneID string, name string) (*Record, error) {
+	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/records?zone_id=%s", zoneID))
+	if err != nil {
+		return nil, fmt.Errorf("Error getting record %s: %s", name, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var response *RecordsResponse
+		err = readAndParseJSONBody(resp, &response)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(response.Records) == 0 {
+			return nil, fmt.Errorf("Error getting record '%s'. It seems there are no records in zone %s at all", name, zoneID)
+		}
+
+		for _, record := range response.Records {
+			if record.Name == name {
+				return &record, nil
+			}
+		}
+
+		return nil, fmt.Errorf("Error getting record '%s'. There are records in zone %s, but %s isn't included", name, zoneID, name)
+	}
+
+	return nil, fmt.Errorf("Error getting Record. HTTP status %d unhandled", resp.StatusCode)
+}
+
+// GetRecord reads the current state of a DNS Record
+func (c *Client) GetRecord(recordID string) (*Record, error) {
+	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/records/%s", recordID))
+	if err != nil {
+		return nil, fmt.Errorf("Error getting record %s: %s", recordID, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var response *RecordResponse
+		err = readAndParseJSONBody(resp, &response)
+		if err != nil {
+			return nil, fmt.Errorf("Error Reading json response of get record %s request: %s", recordID, err)
+		}
+
+		return &response.Record, nil
+	}
+
+	return nil, fmt.Errorf("Error getting Record. HTTP status %d unhandled", resp.StatusCode)
+}
+
+// CreateRecordOpts covers all parameters used to create a new DNS record
+type CreateRecordOpts struct {
+	ZoneID string `json:"zone_id"`
+	Type   string `json:"type"`
+	Name   string `json:"name"`
+	Value  string `json:"value"`
+	TTL    int    `json:"ttl"`
+}
+
+// CreateRecord create a new DNS records
+func (c *Client) CreateRecord(opts CreateRecordOpts) (*Record, error) {
+	reqBody := CreateRecordRequest{ZoneID: opts.ZoneID, Name: opts.Name, TTL: opts.TTL, Type: opts.Type, Value: opts.Value}
+	resp, err := c.doPostRequest("https://dns.hetzner.com/api/v1/records", reqBody)
+	if err != nil {
+		return nil, fmt.Errorf("Error creating record %s: %s", opts.Name, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var response RecordResponse
+		err = readAndParseJSONBody(resp, &response)
+		if err != nil {
+			return nil, err
+		}
+
+		return &response.Record, nil
+	}
+
+	return nil, fmt.Errorf("Error creating Record. HTTP status %d unhandled", resp.StatusCode)
 }
