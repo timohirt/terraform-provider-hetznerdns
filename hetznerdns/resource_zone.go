@@ -48,7 +48,7 @@ func resourceZoneCreate(d *schema.ResourceData, m interface{}) error {
 
 	resp, err := client.CreateZone(opts)
 	if err != nil {
-		log.Printf("[Error] Creating resource zone failed: %s", err)
+		log.Printf("[ERROR] Creating resource zone failed: %s", err)
 		d.SetId("")
 		return err
 	}
@@ -63,8 +63,14 @@ func resourceZoneRead(d *schema.ResourceData, m interface{}) error {
 	zoneID := d.Id()
 	zone, err := client.GetZone(zoneID)
 	if err != nil {
-		log.Printf("[Error] Reading resource zone failed: %s", err)
+		log.Printf("[ERROR] Reading resource zone failed: %s", err)
 		return err
+	}
+
+	if zone == nil {
+		log.Printf("[WARN] DNS zone with id %s doesn't exist, removing it from state", zoneID)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", zone.Name)
@@ -82,8 +88,8 @@ func resourceZoneUpdate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	// delete zone from state as it doesn't exist anymore
 	if zone == nil {
+		log.Printf("[WARN] DNS zone with id %s doesn't exist, removing it from state", zoneID)
 		d.SetId("")
 		return nil
 	}

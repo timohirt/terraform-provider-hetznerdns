@@ -99,9 +99,13 @@ func resourceRecordRead(d *schema.ResourceData, m interface{}) error {
 	id := d.Id()
 	record, err := client.GetRecord(id)
 	if err != nil {
-		log.Printf("[ERROR] Could not get DNS record with id %s, removing it from state", id)
-		d.SetId("")
 		return fmt.Errorf("Error getting record with id %s: %s", id, err)
+	}
+
+	if record == nil {
+		log.Printf("[WARN] DNS record with id %s doesn't exist, removing it from state", id)
+		d.SetId("")
+		return nil
 	}
 
 	d.SetId(record.ID)
