@@ -119,8 +119,32 @@ func resourceRecordRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceRecordUpdate(d *schema.ResourceData, m interface{}) error {
-	log.Printf("[DEBUG] Updaing resource record")
-	//client := m.(*api.Client)
+	log.Printf("[DEBUG] Updating resource record")
+	client := m.(*api.Client)
+
+	id := d.Id()
+	record, err := client.GetRecord(id)
+	if err != nil {
+		return fmt.Errorf("Error getting record with id %s: %s", id, err)
+	}
+
+	if record == nil {
+		log.Printf("[WARN] DNS record with id %s doesn't exist, removing it from state", id)
+		d.SetId("")
+		return nil
+	}
+
+	if d.HasChanges("name", "ttl", "type", "value") {
+		record.Name = d.Get("name").(string)
+		record.TTL = d.Get("ttl").(int)
+		record.Type = d.Get("type").(string)
+		record.Value = d.Get("value").(string)
+
+		record, err = client.UpdateRecord(*record)
+		if err != nil {
+			return err
+		}
+	}
 
 	return resourceRecordRead(d, m)
 }

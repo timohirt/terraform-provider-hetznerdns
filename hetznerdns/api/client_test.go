@@ -148,6 +148,23 @@ func TestClientRecordZone(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestClientUpdateRecordSuccess(t *testing.T) {
+	recordWithUpdates := Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone2.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}
+	recordWithUpdatesJSON := `{"zone_id":"wwwlsksjjenm","id":"12345678","type":"A","name":"zone2.online","value":"192.168.1.1","ttl":3600}`
+	var requestBodyReader io.Reader
+	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","type":"A","name":"zone2.online","value":"192.168.1.1","ttl":3600}}`)
+	config := RequestConfig{responseHTTPStatus: http.StatusOK, requestBodyReader: &requestBodyReader, responseBodyJSON: responseBody}
+	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+
+	updatedRecord, err := client.UpdateRecord(recordWithUpdates)
+
+	assert.NoError(t, err)
+	assert.Equal(t, recordWithUpdates, *updatedRecord)
+	assert.NotNil(t, requestBodyReader, "The request body should not be nil")
+	jsonRequestBody, _ := ioutil.ReadAll(requestBodyReader)
+	assert.Equal(t, recordWithUpdatesJSON, string(jsonRequestBody))
+}
+
 type RequestConfig struct {
 	responseHTTPStatus int
 	responseBodyJSON   []byte

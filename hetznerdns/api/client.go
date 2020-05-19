@@ -126,7 +126,7 @@ func (c *Client) UpdateZone(zone Zone) (*Zone, error) {
 		return &response.Zone, nil
 	}
 
-	return nil, fmt.Errorf("Error updating Zone. HTTP status %d unhandeled", resp.StatusCode)
+	return nil, fmt.Errorf("Error updating Zone. HTTP status %d unhandled", resp.StatusCode)
 }
 
 // DeleteZone deletes a given DNS zone
@@ -293,4 +293,24 @@ func (c *Client) DeleteRecord(id string) error {
 		return nil
 	}
 	return fmt.Errorf("Error deleting Record. HTTP status %d unhandled", resp.StatusCode)
+}
+
+// UpdateRecord create a new DNS records
+func (c *Client) UpdateRecord(record Record) (*Record, error) {
+	resp, err := c.doPutRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/records/%s", record.ID), record)
+	if err != nil {
+		return nil, fmt.Errorf("Error updating record %s: %s", record.ID, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var response RecordResponse
+		err = readAndParseJSONBody(resp, &response)
+		if err != nil {
+			return nil, err
+		}
+
+		return &response.Record, nil
+	}
+
+	return nil, fmt.Errorf("Error creating Record. HTTP status %d unhandled", resp.StatusCode)
 }
