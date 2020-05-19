@@ -62,6 +62,16 @@ func TestClientGetZone(t *testing.T) {
 	assert.Equal(t, Zone{ID: "12345678", Name: "zone1.online", TTL: 3600}, *zone)
 }
 
+func TestClientGetZoneReturnNilIfNotFound(t *testing.T) {
+	config := RequestConfig{responseHTTPStatus: http.StatusNotFound}
+	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+
+	zone, err := client.GetZone("12345678")
+
+	assert.NoError(t, err)
+	assert.Nil(t, zone)
+}
+
 func TestClientGetZoneByName(t *testing.T) {
 	responseBody := []byte(`{"zones":[{"id":"12345678","name":"zone1.online","ttl":3600}]}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
@@ -71,6 +81,16 @@ func TestClientGetZoneByName(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, Zone{ID: "12345678", Name: "zone1.online", TTL: 3600}, *zone)
+}
+
+func TestClientGetZoneByNameReturnNilIfnotFound(t *testing.T) {
+	config := RequestConfig{responseHTTPStatus: http.StatusNotFound}
+	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+
+	zone, err := client.GetZoneByName("zone1.online")
+
+	assert.NoError(t, err)
+	assert.Nil(t, zone)
 }
 
 func TestClientDeleteZone(t *testing.T) {

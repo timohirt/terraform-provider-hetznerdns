@@ -103,6 +103,8 @@ func (c *Client) GetZone(id string) (*Zone, error) {
 			return nil, err
 		}
 		return &response.Zone, nil
+	} else if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
 	}
 
 	return nil, fmt.Errorf("Error getting Zone. HTTP status %d unhandled", resp.StatusCode)
@@ -159,6 +161,8 @@ func (c *Client) GetZoneByName(name string) (*Zone, error) {
 		}
 
 		return &response.Zones[0], nil
+	} else if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
 	}
 
 	return nil, fmt.Errorf("Error getting Zone. HTTP status %d unhandled", resp.StatusCode)
