@@ -1,5 +1,7 @@
 # Terraform Provider for Hetzner DNS
 
+![CI Build](https://github.com/timohirt/terraform-provider-hetznerdns/workflows/CI%20Build/badge.svg?branch=master)
+
 ## Requirements
 
 - [Terraform](https://www.terraform.io/downloads.html) 0.12.x
