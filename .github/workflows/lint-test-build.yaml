@@ -29,9 +29,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
 
-      - name: Run tests
-        run: make test
-
       - name: Run acceptance tests
         run: make testacc
         env:
