@@ -2,7 +2,7 @@
 
 ![CI Build](https://github.com/timohirt/terraform-provider-hetznerdns/workflows/CI%20Build/badge.svg?branch=master)
 
-Blog: [Implementing a Terraform Provider](http://localhost:1313/blog/implementing-a-terraform-provider/)
+Read about what I learnt while [implementing this Terraform Provider](http://www.timohirt.de/blog/implementing-a-terraform-provider/).
 
 ## Requirements
 
