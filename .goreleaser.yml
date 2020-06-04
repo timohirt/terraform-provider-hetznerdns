@@ -6,7 +6,8 @@ builds:
     - darwin
     - windows
   ignore:
-    darwin: 386
+    - goos: darwin
+      goarch: 386
 checksum:
   name_template: 'checksums.txt'
 snapshot:
