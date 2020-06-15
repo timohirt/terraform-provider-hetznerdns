@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+type createHTTPClient func() *http.Client
+
+func defaultCreateHTTPClient() *http.Client {
+	return &http.Client{}
+}
+
 type doHTTPRequests func(apiToken string, method string, url string, body io.Reader) (*http.Response, error)
 
 func defaultDoHTTPRequest(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
@@ -39,13 +45,14 @@ func defaultDoHTTPRequest(apiToken string, method string, url string, body io.Re
 
 // Client for the Hetzner DNS API.
 type Client struct {
-	apiToken      string
-	doHTTPRequest doHTTPRequests
+	apiToken         string
+	doHTTPRequest    doHTTPRequests
+	createHTTPClient createHTTPClient
 }
 
 // NewClient creates a new API Client using a given api token.
 func NewClient(apiToken string) (*Client, error) {
-	return &Client{apiToken: apiToken, doHTTPRequest: defaultDoHTTPRequest}, nil
+	return &Client{apiToken: apiToken, doHTTPRequest: defaultDoHTTPRequest, createHTTPClient: defaultCreateHTTPClient}, nil
 }
 
 func (c *Client) doGetRequest(url string) (*http.Response, error) {

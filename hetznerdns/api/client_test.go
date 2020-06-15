@@ -14,7 +14,7 @@ func TestClientCreateZoneSuccess(t *testing.T) {
 	var requestBodyReader io.Reader
 	responseBody := []byte(`{"zone":{"id":"12345","name":"mydomain.com","ttl":3600}}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, requestBodyReader: &requestBodyReader, responseBodyJSON: responseBody}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	opts := CreateZoneOpts{Name: "mydomain.com", TTL: 3600}
 	zone, err := client.CreateZone(opts)
@@ -27,7 +27,8 @@ func TestClientCreateZoneSuccess(t *testing.T) {
 }
 
 func TestClientCreateZoneInvalidDomainName(t *testing.T) {
-	client := Client{apiToken: "irrelevant"}
+	var irrelevantConfig RequestConfig
+	client := createTestClient(irrelevantConfig)
 	opts := CreateZoneOpts{Name: "thisisinvalid", TTL: 3600}
 	_, err := client.CreateZone(opts)
 
@@ -40,7 +41,7 @@ func TestClientUpdateZoneSuccess(t *testing.T) {
 	var requestBodyReader io.Reader
 	responseBody := []byte(`{"zone":{"id":"12345678","name":"zone1.online","ttl":3600}}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, requestBodyReader: &requestBodyReader, responseBodyJSON: responseBody}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	updatedZone, err := client.UpdateZone(zoneWithUpdates)
 
@@ -54,7 +55,7 @@ func TestClientUpdateZoneSuccess(t *testing.T) {
 func TestClientGetZone(t *testing.T) {
 	responseBody := []byte(`{"zone":{"id":"12345678","name":"zone1.online","ttl":3600}}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	zone, err := client.GetZone("12345678")
 
@@ -64,7 +65,7 @@ func TestClientGetZone(t *testing.T) {
 
 func TestClientGetZoneReturnNilIfNotFound(t *testing.T) {
 	config := RequestConfig{responseHTTPStatus: http.StatusNotFound}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	zone, err := client.GetZone("12345678")
 
@@ -75,7 +76,7 @@ func TestClientGetZoneReturnNilIfNotFound(t *testing.T) {
 func TestClientGetZoneByName(t *testing.T) {
 	responseBody := []byte(`{"zones":[{"id":"12345678","name":"zone1.online","ttl":3600}]}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	zone, err := client.GetZoneByName("zone1.online")
 
@@ -85,7 +86,7 @@ func TestClientGetZoneByName(t *testing.T) {
 
 func TestClientGetZoneByNameReturnNilIfnotFound(t *testing.T) {
 	config := RequestConfig{responseHTTPStatus: http.StatusNotFound}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	zone, err := client.GetZoneByName("zone1.online")
 
@@ -95,7 +96,7 @@ func TestClientGetZoneByNameReturnNilIfnotFound(t *testing.T) {
 
 func TestClientDeleteZone(t *testing.T) {
 	config := RequestConfig{responseHTTPStatus: http.StatusOK}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	err := client.DeleteZone("irrelevant")
 
@@ -105,7 +106,7 @@ func TestClientDeleteZone(t *testing.T) {
 func TestClientGetRecord(t *testing.T) {
 	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","name":"zone1.online","ttl":3600,"type":"A","value":"192.168.1.1"}}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	record, err := client.GetRecord("12345678")
 
@@ -115,7 +116,7 @@ func TestClientGetRecord(t *testing.T) {
 
 func TestClientGetRecordReturnNilIfNotFound(t *testing.T) {
 	config := RequestConfig{responseHTTPStatus: http.StatusNotFound}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	record, err := client.GetRecord("irrelevant")
 
@@ -127,7 +128,7 @@ func TestClientCreateRecordSuccess(t *testing.T) {
 	var requestBodyReader io.Reader
 	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","name":"zone1.online","ttl":3600,"type":"A","value":"192.168.1.1"}}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, requestBodyReader: &requestBodyReader, responseBodyJSON: responseBody}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	opts := CreateRecordOpts{ZoneID: "wwwlsksjjenm", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}
 	record, err := client.CreateRecord(opts)
@@ -141,7 +142,7 @@ func TestClientCreateRecordSuccess(t *testing.T) {
 
 func TestClientRecordZone(t *testing.T) {
 	config := RequestConfig{responseHTTPStatus: http.StatusOK}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	err := client.DeleteRecord("irrelevant")
 
@@ -154,7 +155,7 @@ func TestClientUpdateRecordSuccess(t *testing.T) {
 	var requestBodyReader io.Reader
 	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","type":"A","name":"zone2.online","value":"192.168.1.1","ttl":3600}}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, requestBodyReader: &requestBodyReader, responseBodyJSON: responseBody}
-	client := Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	client := createTestClient(config)
 
 	updatedRecord, err := client.UpdateRecord(recordWithUpdates)
 
@@ -169,6 +170,10 @@ type RequestConfig struct {
 	responseHTTPStatus int
 	responseBodyJSON   []byte
 	requestBodyReader  *io.Reader
+}
+
+func createTestClient(config RequestConfig) Client {
+	return Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
 }
 
 func interceptRequestAndFakeResponse(config RequestConfig) func(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
