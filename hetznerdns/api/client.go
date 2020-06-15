@@ -17,10 +17,19 @@ func defaultCreateHTTPClient() *http.Client {
 	return &http.Client{}
 }
 
-type doHTTPRequests func(apiToken string, method string, url string, body io.Reader) (*http.Response, error)
+// Client for the Hetzner DNS API.
+type Client struct {
+	apiToken         string
+	createHTTPClient createHTTPClient
+}
 
-func defaultDoHTTPRequest(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
-	client := &http.Client{}
+// NewClient creates a new API Client using a given api token.
+func NewClient(apiToken string) (*Client, error) {
+	return &Client{apiToken: apiToken, createHTTPClient: defaultCreateHTTPClient}, nil
+}
+
+func (c *Client) doHTTPRequest(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
+	client := c.createHTTPClient()
 	log.Printf("[DEBUG] HTTP request to API %s %s", method, url)
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -36,23 +45,13 @@ func defaultDoHTTPRequest(apiToken string, method string, url string, body io.Re
 
 	resp, err := client.Do(req)
 
+	log.Printf("[ERROR] Response: %s", resp.Status)
+
 	if err != nil {
 		log.Printf("[DEBUG] Error while sending HTTP request to API %s", err)
 		return nil, err
 	}
 	return resp, nil
-}
-
-// Client for the Hetzner DNS API.
-type Client struct {
-	apiToken         string
-	doHTTPRequest    doHTTPRequests
-	createHTTPClient createHTTPClient
-}
-
-// NewClient creates a new API Client using a given api token.
-func NewClient(apiToken string) (*Client, error) {
-	return &Client{apiToken: apiToken, doHTTPRequest: defaultDoHTTPRequest, createHTTPClient: defaultCreateHTTPClient}, nil
 }
 
 func (c *Client) doGetRequest(url string) (*http.Response, error) {

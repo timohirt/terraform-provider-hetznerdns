@@ -173,20 +173,27 @@ type RequestConfig struct {
 }
 
 func createTestClient(config RequestConfig) Client {
-	return Client{apiToken: "irrelevant", doHTTPRequest: interceptRequestAndFakeResponse(config)}
+	fakeHTTPClient := TestClient{config: config}
+	createFakeHTTPClient := func() *http.Client {
+		return &http.Client{Transport: fakeHTTPClient}
+	}
+	return Client{apiToken: "irrelevant", createHTTPClient: createFakeHTTPClient}
 }
 
-func interceptRequestAndFakeResponse(config RequestConfig) func(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
-	return func(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
-		if body != nil && config.requestBodyReader != nil {
-			*config.requestBodyReader = body
-		}
+type TestClient struct {
+	config RequestConfig
+}
 
-		var jsonBody io.ReadCloser = nil
-		if config.responseBodyJSON != nil {
-			jsonBody = ioutil.NopCloser(bytes.NewReader(config.responseBodyJSON))
-		}
-		resp := http.Response{StatusCode: config.responseHTTPStatus, Body: jsonBody}
-		return &resp, nil
+// See https://golang.org/pkg/net/http/#RoundTripper
+func (f TestClient) RoundTrip(req *http.Request) (*http.Response, error) {
+	if req.Body != nil && f.config.requestBodyReader != nil {
+		*f.config.requestBodyReader = req.Body
 	}
+
+	var jsonBody io.ReadCloser = nil
+	if f.config.responseBodyJSON != nil {
+		jsonBody = ioutil.NopCloser(bytes.NewReader(f.config.responseBodyJSON))
+	}
+	resp := http.Response{StatusCode: f.config.responseHTTPStatus, Body: jsonBody}
+	return &resp, nil
 }
