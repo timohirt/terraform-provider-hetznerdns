@@ -166,6 +166,18 @@ func TestClientUpdateRecordSuccess(t *testing.T) {
 	assert.Equal(t, recordWithUpdatesJSON, string(jsonRequestBody))
 }
 
+func TestClientHandleUnauthorizedRequest(t *testing.T) {
+	responseBody := []byte(`{"message":"Invalid API key"}`)
+	config := RequestConfig{responseHTTPStatus: http.StatusUnauthorized, responseBodyJSON: responseBody}
+	client := createTestClient(config)
+
+	opts := CreateZoneOpts{Name: "mydomain.com", TTL: 3600}
+	_, err := client.CreateZone(opts)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "'Invalid API key'", "Error message didn't contain error message from API.")
+}
+
 type RequestConfig struct {
 	responseHTTPStatus int
 	responseBodyJSON   []byte

@@ -11,6 +11,11 @@ import (
 	"strings"
 )
 
+// UnauthorizedError represents the message of a HTTP 401 response
+type UnauthorizedError struct {
+	Message string `json:"message"`
+}
+
 type createHTTPClient func() *http.Client
 
 func defaultCreateHTTPClient() *http.Client {
@@ -45,13 +50,28 @@ func (c *Client) doHTTPRequest(apiToken string, method string, url string, body 
 
 	resp, err := client.Do(req)
 
-	log.Printf("[ERROR] Response: %s", resp.Status)
-
 	if err != nil {
 		log.Printf("[DEBUG] Error while sending HTTP request to API %s", err)
 		return nil, err
 	}
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		unauthorizedError, err := parseUnauthorizedError(resp)
+		if err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("API return 401 Unauthorized with message: '%s'. Double check your API key is still valid", unauthorizedError.Message)
+	}
 	return resp, nil
+}
+
+func parseUnauthorizedError(resp *http.Response) (*UnauthorizedError, error) {
+	var unauthorizedError UnauthorizedError
+	err := readAndParseJSONBody(resp, &unauthorizedError)
+	if err != nil {
+		return nil, err
+	}
+	return &unauthorizedError, nil
 }
 
 func (c *Client) doGetRequest(url string) (*http.Response, error) {
@@ -190,7 +210,7 @@ func (c *Client) CreateZone(opts CreateZoneOpts) (*Zone, error) {
 	reqBody := CreateZoneRequest{Name: opts.Name, TTL: opts.TTL}
 	resp, err := c.doPostRequest("https://dns.hetzner.com/api/v1/zones", reqBody)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating zone %s", err)
+		return nil, fmt.Errorf("Error creating zone. %s", err)
 	}
 
 	if resp.StatusCode == http.StatusOK {
