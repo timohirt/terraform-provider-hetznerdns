@@ -173,7 +173,7 @@ type RequestConfig struct {
 
 func interceptRequestAndFakeResponse(config RequestConfig) func(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
 	return func(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
-		if body != nil {
+		if body != nil && config.requestBodyReader != nil {
 			*config.requestBodyReader = body
 		}
 
