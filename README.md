@@ -34,8 +34,11 @@ resource "hetznerdns_zone" "zone1" {
 
 The following arguments are supported:
 
-- `name` - (Required, string) Name of the DNS zone to create. 
-  Must be a valid domain with top level domain (eg. .de, .com, .io).
+- `name` - (Required, string) Name of the DNS zone to create. Must be a valid
+  domain with top level domain. Meaning `<domain>.de` or `<domain>.io`. Don't
+  include sub domains on this level. So, no `sub.<domain>.io`. The Hetzner API
+  rejects attempts to create a zone with a sub domain name. Use a record to
+  create the sub domain.
 
 - `ttl` - (Required, int) Time to live of this zone.
 
