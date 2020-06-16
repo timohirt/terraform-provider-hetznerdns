@@ -134,6 +134,8 @@ func (c *Client) doPutRequest(url string, bodyJSON interface{}) (*http.Response,
 
 func readAndParseJSONBody(resp *http.Response, respType interface{}) error {
 	body, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
 	if err != nil {
 		return fmt.Errorf("Error reading HTTP response body %s", err)
 	}
