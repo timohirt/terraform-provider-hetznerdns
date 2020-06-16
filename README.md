@@ -109,7 +109,6 @@ data "hetznerdns_zone" "zone1" {
 
 - `id` - (Required, string) The ID of the DNS zone.
 
-- `name` - (Required, string) Name of the DNS zone to create. 
-  Must be a valid domain with top level domain (eg. .de, .com, .io)
+- `name` - (Required, string) Name of the DNS zone to get data from. 
 
 - `ttl` - (Required, int) Time to live of this zone.
