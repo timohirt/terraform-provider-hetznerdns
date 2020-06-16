@@ -80,7 +80,6 @@ The following arguments are supported:
   the record in. 
 
 - `name` - (Required, string) Name of the DNS record to create. 
-  Must be a valid domain with top level domain (eg. .de, .com, .io).
 
 - `value` - (Required, string) The value of the record (eg. 192.168.1.1).
 
