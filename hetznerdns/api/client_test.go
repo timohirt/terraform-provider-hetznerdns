@@ -26,6 +26,18 @@ func TestClientCreateZoneSuccess(t *testing.T) {
 	assert.Equal(t, `{"name":"mydomain.com","ttl":3600}`, string(jsonRequestBody))
 }
 
+func TestClientCreateZoneInvalidDomain(t *testing.T) {
+	responseBody := []byte(`{"zone":{"id":"","name":"","ttl":0,"registrar":"","legacy_dns_host":"","legacy_ns":null,"ns":null,"created":"","verified":"","modified":"","project":"","owner":"","permission":"","zone_type":{"id":"","name":"","description":"","prices":null},"status":"","paused":false,"is_secondary_dns":false,"txt_verification":{"name":"","token":""},"records_count":0},"error":{"message":"422 : invalid TLD","code":422}}`)
+	config := RequestConfig{responseHTTPStatus: http.StatusUnprocessableEntity, responseBodyJSON: responseBody}
+
+	client := createTestClient(config)
+	opts := CreateZoneOpts{Name: "this.is.invalid", TTL: 3600}
+	_, err := client.CreateZone(opts)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "API returned HTTP 422 Unprocessable Entity error with message: '422 : invalid TLD'")
+}
+
 func TestClientCreateZoneInvalidTLD(t *testing.T) {
 	var irrelevantConfig RequestConfig
 	client := createTestClient(irrelevantConfig)

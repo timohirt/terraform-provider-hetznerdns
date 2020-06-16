@@ -12,7 +12,15 @@ import (
 )
 
 // UnauthorizedError represents the message of a HTTP 401 response
-type UnauthorizedError struct {
+type UnauthorizedError ErrorMessage
+
+// UnprocessableEntityError represents the generic structure of a error response
+type UnprocessableEntityError struct {
+	Error ErrorMessage `json:"error"`
+}
+
+// ErrorMessage is the message of an error response
+type ErrorMessage struct {
 	Message string `json:"message"`
 }
 
@@ -38,7 +46,6 @@ func (c *Client) doHTTPRequest(apiToken string, method string, url string, body 
 	log.Printf("[DEBUG] HTTP request to API %s %s", method, url)
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		log.Printf("[DEBUG] Error while creating HTTP request to API %s", err)
 		return nil, err
 	}
 
@@ -49,9 +56,7 @@ func (c *Client) doHTTPRequest(apiToken string, method string, url string, body 
 	}
 
 	resp, err := client.Do(req)
-
 	if err != nil {
-		log.Printf("[DEBUG] Error while sending HTTP request to API %s", err)
 		return nil, err
 	}
 
@@ -60,9 +65,34 @@ func (c *Client) doHTTPRequest(apiToken string, method string, url string, body 
 		if err != nil {
 			return nil, err
 		}
-		return nil, fmt.Errorf("API return 401 Unauthorized with message: '%s'. Double check your API key is still valid", unauthorizedError.Message)
+		return nil, fmt.Errorf("API returned HTTP 401 Unauthorized error with message: '%s'. Double check your API key is still valid", unauthorizedError.Message)
+
+	} else if resp.StatusCode == http.StatusUnprocessableEntity {
+		unprocessableEntityError, err := parseUnprocessableEntityError(resp)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, fmt.Errorf("API returned HTTP 422 Unprocessable Entity error with message: '%s'", unprocessableEntityError.Error.Message)
 	}
 	return resp, nil
+}
+
+func parseUnprocessableEntityError(resp *http.Response) (*UnprocessableEntityError, error) {
+	body, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	if err != nil {
+		return nil, fmt.Errorf("Error reading HTTP response body: %e", err)
+	}
+	log.Printf("[DEBUG] 422 Unprocessable Entity error response body: %s", string(body))
+
+	var unprocessableEntityError UnprocessableEntityError
+	err = parseJSON(body, &unprocessableEntityError)
+	if err != nil {
+		return nil, err
+	}
+	return &unprocessableEntityError, nil
 }
 
 func parseUnauthorizedError(resp *http.Response) (*UnauthorizedError, error) {
@@ -108,11 +138,11 @@ func readAndParseJSONBody(resp *http.Response, respType interface{}) error {
 		return fmt.Errorf("Error reading HTTP response body %s", err)
 	}
 
-	err = json.Unmarshal(body, &respType)
-	if err != nil {
-		return fmt.Errorf("Error parsing JSON %s: %s", err, body)
-	}
-	return nil
+	return parseJSON(body, respType)
+}
+
+func parseJSON(data []byte, respType interface{}) error {
+	return json.Unmarshal(data, &respType)
 }
 
 // GetZone reads the current state of a DNS zone
