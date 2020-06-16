@@ -26,13 +26,14 @@ func TestClientCreateZoneSuccess(t *testing.T) {
 	assert.Equal(t, `{"name":"mydomain.com","ttl":3600}`, string(jsonRequestBody))
 }
 
-func TestClientCreateZoneInvalidDomainName(t *testing.T) {
+func TestClientCreateZoneInvalidTLD(t *testing.T) {
 	var irrelevantConfig RequestConfig
 	client := createTestClient(irrelevantConfig)
 	opts := CreateZoneOpts{Name: "thisisinvalid", TTL: 3600}
 	_, err := client.CreateZone(opts)
 
-	assert.Error(t, err, "A invalid domain name was used. This should result in an error.")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "'thisisinvalid' is not a valid domain")
 }
 
 func TestClientUpdateZoneSuccess(t *testing.T) {

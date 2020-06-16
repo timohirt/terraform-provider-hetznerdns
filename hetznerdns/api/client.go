@@ -204,7 +204,7 @@ type CreateZoneOpts struct {
 func (c *Client) CreateZone(opts CreateZoneOpts) (*Zone, error) {
 
 	if !strings.Contains(opts.Name, ".") {
-		return nil, fmt.Errorf("Error creating zone. The name '%s' is not a valid domain name with top level domain", opts.Name)
+		return nil, fmt.Errorf("Error creating zone. The name '%s' is not a valid domain. It must correspond to the schema <domain>.<tld>", opts.Name)
 	}
 
 	reqBody := CreateZoneRequest{Name: opts.Name, TTL: opts.TTL}
