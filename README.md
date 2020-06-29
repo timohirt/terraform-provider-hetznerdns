@@ -13,7 +13,45 @@ Read about what I learnt while [implementing this Terraform Provider](http://www
 
 ## Installing and Using this Plugin
 
-See [INSTALL.md](./INSTALL.md).
+See [INSTALL](./INSTALL.md). 
+
+Once installed you have three Options to provide the required API token that
+is used to authenticate at the Hetzner DNS API.
+
+### Enter API Token when needed
+
+You can enter it every time you run `terraform`. 
+
+### Configure the Provider to take the API Token from a Variable
+
+Add the following to your `terraform.tf`:
+
+```
+variable "hetznerdns_token" {}
+
+provider "hetznerdns" {
+  apitoken = var.hetznerdns_token
+}
+```
+
+Now, assign the your API token to `hetznerdns_token` in `terraform.tfvars`:
+
+```
+hetznerdns_token = kkd993i3kkmm4m4m4
+```
+
+You don't have to enter the API token anymore.
+
+### Inject the API Token via the Environment
+
+Assign the API token to `HETZNER_DNS_API_TOKEN` env variable.
+
+```
+export HETZNER_DNS_API_TOKEN=<your api token>
+```
+
+The provider uses this token and you don't have to enter it
+anymore.
 
 ## Resources
 

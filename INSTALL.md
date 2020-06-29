@@ -5,6 +5,8 @@ to download and install it on your own. Pick the binary for the target operating
 system from the [releases list](https://github.com/timohirt/terraform-provider-hetznerdns/releases)
 and download the archive.
 
+## Installing the Provider 
+
 Terraform looks for providers in `~/.terraform.d/plugins`. Extract the archive and
 copy the executable to this directory. See [Terraform documentation](https://www.terraform.io/docs/configuration/providers.html#third-party-plugins)
 for more details.
@@ -14,6 +16,8 @@ $ mkdir -p ~/.terraform.d/plugins
 $ tar xzf terraform-provider-hetznerdns_1.0.0_linux_amd64.tar.gz
 $ mv ./terraform-provider-hetznerdns ~/.terraform.d/plugins
 ```
+
+## Testing 
 
 Next add a hetznerdns resource or data source to your project and run 
 terraform init.
@@ -49,6 +53,3 @@ provider.hetznerdns.apitoken
 ```
 
 Enter your Hetzer DNS API key and hit enter. 
-
-Set Hetzner DNS API key environment variable and you don't have to enter
-it manually: `export HETZNER_DNS_API_TOKEN=<your api token>`
