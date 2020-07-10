@@ -46,7 +46,7 @@ func resourceRecord() *schema.Resource {
 }
 
 func resourceRecordCreate(d *schema.ResourceData, m interface{}) error {
-	log.Printf("[DEBUG] Updaing resource record")
+	log.Printf("[DEBUG] Updating resource record")
 	client := m.(*api.Client)
 
 	zoneID, zoneIDNonEmpty := d.GetOk("zone_id")
@@ -84,7 +84,7 @@ func resourceRecordCreate(d *schema.ResourceData, m interface{}) error {
 
 	record, err := client.CreateRecord(opts)
 	if err != nil {
-		log.Printf("[ERROR] Error Creating DNs record %s: %s", opts.Name, err)
+		log.Printf("[ERROR] Error creating DNS record %s: %s", opts.Name, err)
 		return fmt.Errorf("Error creating DNS record %s: %s", opts.Name, err)
 	}
 
