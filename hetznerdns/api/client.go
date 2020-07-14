@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 )
 
 // UnauthorizedError represents the message of a HTTP 401 response
@@ -32,6 +33,7 @@ func defaultCreateHTTPClient() *http.Client {
 
 // Client for the Hetzner DNS API.
 type Client struct {
+	requestLock      sync.Mutex
 	apiToken         string
 	createHTTPClient createHTTPClient
 }
@@ -55,7 +57,16 @@ func (c *Client) doHTTPRequest(apiToken string, method string, url string, body 
 		req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	}
 
+	// This lock ensures that only one request is sent to Hetzber API
+	// at a time. See issue #5 for context.
+	// It seems that Terraform creates multiple resources simultanously
+	// and the API can't handle this right now.
+	c.requestLock.Lock()
+
 	resp, err := client.Do(req)
+
+	c.requestLock.Unlock()
+
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +96,6 @@ func parseUnprocessableEntityError(resp *http.Response) (*UnprocessableEntityErr
 	if err != nil {
 		return nil, fmt.Errorf("Error reading HTTP response body: %e", err)
 	}
-	log.Printf("[DEBUG] 422 Unprocessable Entity error response body: %s", string(body))
-
 	var unprocessableEntityError UnprocessableEntityError
 	err = parseJSON(body, &unprocessableEntityError)
 	if err != nil {
