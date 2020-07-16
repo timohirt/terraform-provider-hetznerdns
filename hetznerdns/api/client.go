@@ -57,15 +57,7 @@ func (c *Client) doHTTPRequest(apiToken string, method string, url string, body 
 		req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	}
 
-	// This lock ensures that only one request is sent to Hetzber API
-	// at a time. See issue #5 for context.
-	// It seems that Terraform creates multiple resources simultanously
-	// and the API can't handle this right now.
-	c.requestLock.Lock()
-
 	resp, err := client.Do(req)
-
-	c.requestLock.Unlock()
 
 	if err != nil {
 		return nil, err
@@ -128,7 +120,13 @@ func (c *Client) doPostRequest(url string, bodyJSON interface{}) (*http.Response
 	}
 	body := bytes.NewReader(reqJSON)
 
-	return c.doHTTPRequest(c.apiToken, http.MethodPost, url, body)
+	// This lock ensures that only one Post request is sent to Hetzber API
+	// at a time. See issue #5 for context.
+	c.requestLock.Lock()
+	response, err := c.doHTTPRequest(c.apiToken, http.MethodPost, url, body)
+	c.requestLock.Unlock()
+
+	return response, err
 }
 
 func (c *Client) doPutRequest(url string, bodyJSON interface{}) (*http.Response, error) {
@@ -138,7 +136,13 @@ func (c *Client) doPutRequest(url string, bodyJSON interface{}) (*http.Response,
 	}
 	body := bytes.NewReader(reqJSON)
 
-	return c.doHTTPRequest(c.apiToken, http.MethodPut, url, body)
+	// This lock ensures that only one Post request is sent to Hetzber API
+	// at a time. See issue #5 for context.
+	c.requestLock.Lock()
+	response, err := c.doHTTPRequest(c.apiToken, http.MethodPut, url, body)
+	c.requestLock.Unlock()
+
+	return response, err
 }
 
 func readAndParseJSONBody(resp *http.Response, respType interface{}) error {
