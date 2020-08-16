@@ -22,6 +22,26 @@ is used to authenticate at the Hetzner DNS API.
 
 You can enter it every time you run `terraform`. 
 
+### Set Provider Source Location (Terraform 0.13)
+
+Terraform 0.13 requires [provider source locations](https://www.terraform.io/upgrade-guides/0-13.html#explicit-provider-source-locations) to be specified in the terraform
+configuration. If you don't have one, then just create `terraform.tf` in your
+main directory.
+
+```
+terraform {
+  required_providers {
+    hetznerdns = {
+      source = "github.com/timohirt/hetznerdns"
+    }
+  }
+  required_version = ">= 0.13"
+}
+```
+
+Above the hetznerdns provider was added. See [Install](INSTALL.md#terraform-013) how to install
+the provider on locally, so that Terraform can find it.
+
 ### Configure the Provider to take the API Token from a Variable
 
 Add the following to your `terraform.tf`:
