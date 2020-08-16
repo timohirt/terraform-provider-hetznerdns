@@ -8,7 +8,7 @@ Read about what I learnt while [implementing this Terraform Provider](http://www
 
 ## Requirements
 
-- [Terraform](https://www.terraform.io/downloads.html) 0.12.x
+- [Terraform](https://www.terraform.io/downloads.html) 0.12.x / 0.13.x
 - [Go](https://golang.org/) 1.14 (to build the provider plugin)
 
 ## Installing and Using this Plugin
