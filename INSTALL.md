@@ -7,6 +7,8 @@ and download the archive.
 
 ## Installing the Provider 
 
+### Terraform 0.12
+
 Terraform looks for providers in `~/.terraform.d/plugins`. Extract the archive and
 copy the executable to this directory. See [Terraform documentation](https://www.terraform.io/docs/configuration/providers.html#third-party-plugins)
 for more details.
@@ -16,6 +18,22 @@ $ mkdir -p ~/.terraform.d/plugins
 $ tar xzf terraform-provider-hetznerdns_1.0.0_linux_amd64.tar.gz
 $ mv ./terraform-provider-hetznerdns ~/.terraform.d/plugins
 ```
+
+### Terraform 0.13
+
+Terraform 0.13 changed the [location of custom providers](https://www.terraform.io/upgrade-guides/0-13.html#new-filesystem-layout-for-local-copies-of-providers), in order to work
+nicly with the Terraform Registry. This means that you have to create or migrate
+to a slighly different directory structure where you put the provide binaries.
+
+```bash
+$ mkdir -p ~/.terraform.d/plugins/github.com/timohirt/hetznerdns/1.0.5/linux_amd64
+$ tar xzf terraform-provider-hetznerdns_1.0.5_linux_amd64.tar.gz
+$ mv ./terraform-provider-hetznerdns ~/.terraform.d/plugins/github.com/timohirt/hetznerdns/1.0.5/linux_amd64/terraform-provider-hetznerdns_v1.0.5
+```
+
+As you can see above, the version as well as the operating system is now included in
+the path and filename. Make sure you pick the right binaries for the os and use `darwin_amd64` 
+or `win_amd64` instead of `linux_amd64` if necessary.
 
 ## Testing 
 
