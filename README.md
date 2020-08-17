@@ -57,7 +57,7 @@ terraform {
 }
 ```
 
-### Authentication
+## Authentication
 
 Once installed you have three ptions to provide the required API token that
 is used to authenticate at the Hetzner DNS API.
