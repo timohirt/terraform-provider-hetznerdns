@@ -13,20 +13,16 @@ Read about what I learnt while [implementing this Terraform Provider](http://www
 
 ## Installing and Using this Plugin
 
-See [INSTALL](./INSTALL.md). 
+If you want or need to install the provider locally, take a look at
+[INSTALL](./INSTALL.md). For Terraform <= 0.12 this is required in order
+to use this provider.
 
-Once installed you have three Options to provide the required API token that
-is used to authenticate at the Hetzner DNS API.
+### Using Provider from Terraform Registry (TF >= 0.13)
 
-### Enter API Token when needed
+### Install and Use Provider on your Local Machine (TF >=0.13)
 
-You can enter it every time you run `terraform`. 
-
-### Set Provider Source Location (Terraform 0.13)
-
-Terraform 0.13 requires [provider source locations](https://www.terraform.io/upgrade-guides/0-13.html#explicit-provider-source-locations) to be specified in the terraform
-configuration. If you don't have one, then just create `terraform.tf` in your
-main directory.
+After installing the provider as descibed in [INSTALL](./INSTALL.md), 
+add the following to your `terraform.tf`.
 
 ```
 terraform {
@@ -39,8 +35,14 @@ terraform {
 }
 ```
 
-Above the hetznerdns provider was added. See [Install](INSTALL.md#terraform-013) how to install
-the provider on locally, so that Terraform can find it.
+### Authentication
+
+Once installed you have three ptions to provide the required API token that
+is used to authenticate at the Hetzner DNS API.
+
+### Enter API Token when needed
+
+You can enter it every time you run `terraform`. 
 
 ### Configure the Provider to take the API Token from a Variable
 
