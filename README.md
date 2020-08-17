@@ -8,7 +8,7 @@ Read about what I learnt while [implementing this Terraform Provider](http://www
 
 **This provider is on published on the Terraform registry**. You can find resources
 and data sources [documentation](https://registry.terraform.io/providers/timohirt/hetznerdns/latest/docs) there
-or [here](docs/index.md).
+or [here](docs).
 
 ## Requirements
 
