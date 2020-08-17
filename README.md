@@ -6,8 +6,9 @@
 
 Read about what I learnt while [implementing this Terraform Provider](http://www.timohirt.de/blog/implementing-a-terraform-provider/).
 
-This provider is on published on the Terraform registry. You can find resources
-and data sources [documentation](https://registry.terraform.io/providers/timohirt/hetznerdns/latest/docs) there.
+**This provider is on published on the Terraform registry**. You can find resources
+and data sources [documentation](https://registry.terraform.io/providers/timohirt/hetznerdns/latest/docs) there
+or [here](docs/index.md).
 
 ## Requirements
 
