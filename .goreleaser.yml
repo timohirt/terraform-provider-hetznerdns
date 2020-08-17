@@ -8,8 +8,13 @@ builds:
   ignore:
     - goos: darwin
       goarch: 386
+  binary: '{{ .ProjectName }}_v{{ .Version }}'
+archives:
+- format: zip
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 checksum:
-  name_template: 'checksums.txt'
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  algorithm: sha256
 snapshot:
   name_template: "{{ .Tag }}-PREVIEW"
 changelog:
@@ -18,3 +23,5 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+release:
+  draft: true
