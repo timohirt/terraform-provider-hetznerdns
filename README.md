@@ -13,6 +13,7 @@ or [here](docs).
 ## Requirements
 
 - [Terraform](https://www.terraform.io/downloads.html) 0.12.x / 0.13.x
+  - Read how [insekticid](https://github.com/insekticid) migrated from 0.12 to 0.13 in this [article](https://www.exploit.cz/how-to-migrate-from-plugins-to-terraform-0-13-registry-providers/).
 - [Go](https://golang.org/) 1.14 (to build the provider plugin)
 
 ## Installing and Using this Plugin
