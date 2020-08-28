@@ -31,4 +31,4 @@ The following arguments are supported:
 
 - `type` - (Required, string) The type of the record.
 
-- `ttl` - (Required, int) Time to live of this record.
+- `ttl` - (Optional, int) Time to live of this record.
