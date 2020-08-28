@@ -329,7 +329,7 @@ type CreateRecordOpts struct {
 	Type   string `json:"type"`
 	Name   string `json:"name"`
 	Value  string `json:"value"`
-	TTL    int    `json:"ttl"`
+	TTL    *int   `json:"ttl,omitempty"`
 }
 
 // CreateRecord create a new DNS records

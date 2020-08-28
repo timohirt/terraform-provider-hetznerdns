@@ -39,7 +39,7 @@ func resourceRecord() *schema.Resource {
 			},
 			"ttl": {
 				Type:     schema.TypeInt,
-				Required: true,
+				Optional: true,
 			},
 		},
 	}
@@ -64,11 +64,6 @@ func resourceRecordCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Type of record not set")
 	}
 
-	tTL, tTLNonEmpty := d.GetOk("ttl")
-	if !tTLNonEmpty {
-		return fmt.Errorf("TTL of record not set")
-	}
-
 	value, valueNonEmpty := d.GetOk("value")
 	if !valueNonEmpty {
 		return fmt.Errorf("Value of record not set")
@@ -79,7 +74,12 @@ func resourceRecordCreate(d *schema.ResourceData, m interface{}) error {
 		Name:   name.(string),
 		Type:   recordType.(string),
 		Value:  value.(string),
-		TTL:    tTL.(int),
+	}
+
+	tTL, tTLNonEmpty := d.GetOk("ttl")
+	if tTLNonEmpty {
+		nonEmptyTTL := tTL.(int)
+		opts.TTL = &nonEmptyTTL
 	}
 
 	record, err := client.CreateRecord(opts)
@@ -112,7 +112,11 @@ func resourceRecordRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("name", record.Name)
 	d.Set("zone_id", record.ZoneID)
 	d.Set("type", record.Type)
-	d.Set("ttl", record.TTL)
+
+	d.Set("ttl", nil)
+	if record.HasTTL() {
+		d.Set("ttl", record.TTL)
+	}
 	d.Set("value", record.Value)
 
 	return nil
@@ -136,7 +140,10 @@ func resourceRecordUpdate(d *schema.ResourceData, m interface{}) error {
 
 	if d.HasChanges("name", "ttl", "type", "value") {
 		record.Name = d.Get("name").(string)
-		record.TTL = d.Get("ttl").(int)
+		ttl, ttlNonEmpty := d.GetOk("ttl")
+		if ttlNonEmpty {
+			record.TTL = ttl.(*int)
+		}
 		record.Type = d.Get("type").(string)
 		record.Value = d.Get("value").(string)
 

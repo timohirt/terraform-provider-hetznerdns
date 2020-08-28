@@ -117,6 +117,7 @@ func TestClientDeleteZone(t *testing.T) {
 }
 
 func TestClientGetRecord(t *testing.T) {
+	aTTL := 3600
 	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","name":"zone1.online","ttl":3600,"type":"A","value":"192.168.1.1"}}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
 	client := createTestClient(config)
@@ -124,7 +125,18 @@ func TestClientGetRecord(t *testing.T) {
 	record, err := client.GetRecord("12345678")
 
 	assert.NoError(t, err)
-	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}, *record)
+	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: &aTTL, Type: "A", Value: "192.168.1.1"}, *record)
+}
+
+func TestClientGetRecordWithUndefinedTTL(t *testing.T) {
+	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","name":"zone1.online","type":"A","value":"192.168.1.1"}}`)
+	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
+	client := createTestClient(config)
+
+	record, err := client.GetRecord("12345678")
+
+	assert.NoError(t, err)
+	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: nil, Type: "A", Value: "192.168.1.1"}, *record)
 }
 
 func TestClientGetRecordReturnNilIfNotFound(t *testing.T) {
@@ -143,11 +155,12 @@ func TestClientCreateRecordSuccess(t *testing.T) {
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, requestBodyReader: &requestBodyReader, responseBodyJSON: responseBody}
 	client := createTestClient(config)
 
-	opts := CreateRecordOpts{ZoneID: "wwwlsksjjenm", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}
+	aTTL := 3600
+	opts := CreateRecordOpts{ZoneID: "wwwlsksjjenm", Name: "zone1.online", TTL: &aTTL, Type: "A", Value: "192.168.1.1"}
 	record, err := client.CreateRecord(opts)
 
 	assert.NoError(t, err)
-	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}, *record)
+	assert.Equal(t, Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: &aTTL, Type: "A", Value: "192.168.1.1"}, *record)
 	assert.NotNil(t, requestBodyReader, "The request body should not be nil")
 	jsonRequestBody, _ := ioutil.ReadAll(requestBodyReader)
 	assert.Equal(t, `{"zone_id":"wwwlsksjjenm","type":"A","name":"zone1.online","value":"192.168.1.1","ttl":3600}`, string(jsonRequestBody))
@@ -163,7 +176,8 @@ func TestClientRecordZone(t *testing.T) {
 }
 
 func TestClientUpdateRecordSuccess(t *testing.T) {
-	recordWithUpdates := Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone2.online", TTL: 3600, Type: "A", Value: "192.168.1.1"}
+	aTTL := 3600
+	recordWithUpdates := Record{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone2.online", TTL: &aTTL, Type: "A", Value: "192.168.1.1"}
 	recordWithUpdatesJSON := `{"zone_id":"wwwlsksjjenm","id":"12345678","type":"A","name":"zone2.online","value":"192.168.1.1","ttl":3600}`
 	var requestBodyReader io.Reader
 	responseBody := []byte(`{"record":{"zone_id":"wwwlsksjjenm","id":"12345678","type":"A","name":"zone2.online","value":"192.168.1.1","ttl":3600}}`)
