@@ -18,6 +18,11 @@ type CreateZoneResponse struct {
 	Zone Zone `json:"zone"`
 }
 
+// GetZonesResponse represents the content of a GET Zones request
+type GetZonesResponse struct {
+	Zones []Zone `json:"zones"`
+}
+
 // GetZoneResponse represents the content of a GET Zone request
 type GetZoneResponse struct {
 	Zone Zone `json:"zone"`
