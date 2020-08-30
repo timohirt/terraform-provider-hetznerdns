@@ -65,29 +65,6 @@ func TestClientUpdateZoneSuccess(t *testing.T) {
 	assert.Equal(t, zoneWithUpdatesJSON, string(jsonRequestBody))
 }
 
-func TestClientGetAllZonesWhenThereAreNoZonesCreatedYet(t *testing.T) {
-	responseBody := []byte(`{"zones":[]}`)
-	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
-	client := createTestClient(config)
-
-	allZones, err := client.GetAllZones()
-
-	assert.NoError(t, err)
-	assert.Empty(t, allZones)
-}
-
-func TestClientGetAllZones(t *testing.T) {
-	responseBody := []byte(`{"zones":[{"id":"12345678","name":"zone1.online","ttl":3600},{"id":"98765432","name":"zone2.online","ttl":3600}]}`)
-	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
-	client := createTestClient(config)
-
-	allZones, err := client.GetAllZones()
-
-	assert.NoError(t, err)
-	assert.Contains(t, allZones, Zone{ID: "12345678", Name: "zone1.online", TTL: 3600})
-	assert.Contains(t, allZones, Zone{ID: "98765432", Name: "zone2.online", TTL: 3600})
-}
-
 func TestClientGetZone(t *testing.T) {
 	responseBody := []byte(`{"zone":{"id":"12345678","name":"zone1.online","ttl":3600}}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}

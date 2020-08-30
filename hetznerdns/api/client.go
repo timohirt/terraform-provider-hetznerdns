@@ -160,30 +160,6 @@ func parseJSON(data []byte, respType interface{}) error {
 	return json.Unmarshal(data, &respType)
 }
 
-// GetAllZones returns the current state of all zones
-func (c *Client) GetAllZones() ([]Zone, error) {
-	maxZonesInResult := 150
-	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/zones?per_page=%d", maxZonesInResult))
-	if err != nil {
-		return nil, fmt.Errorf("Error getting all zones: %s", err)
-	}
-
-	if resp.StatusCode == http.StatusOK {
-		var response GetZonesResponse
-		err = readAndParseJSONBody(resp, &response)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(response.Zones) == maxZonesInResult {
-			log.Printf("[WARN] Get all Zones returned %d results which is the max zones currently handled. Other zones might be missing.", maxZonesInResult)
-		}
-		return response.Zones, nil
-	}
-
-	return nil, fmt.Errorf("Error getting Zone. HTTP status %d unhandled", resp.StatusCode)
-}
-
 // GetZone reads the current state of a DNS zone
 func (c *Client) GetZone(id string) (*Zone, error) {
 	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/zones/%s", id))
