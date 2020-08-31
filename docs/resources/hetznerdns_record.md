@@ -57,7 +57,7 @@ curl "https://dns.hetzner.com/api/v1/records" \
       "modified": "2020-08-28 19:51:41.275 +0000 UTC"
     },
     {
-      "id": "ed2416cb6bc8a8055b5855f",
+      "id": "ed2416cb6bc8a8055b22222",
       "type": "A",
       "name": "www",
       "value": "1.1.1.1",
@@ -74,5 +74,5 @@ used for formatting and is not required. Use the `id` to import a
 record. 
 
 ```
-terraform import hetznerdns_record.dkim_1 <id>
+terraform import hetznerdns_record.dkim_1 ed2416cb6bc8a8055b22222
 ```

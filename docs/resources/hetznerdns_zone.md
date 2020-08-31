@@ -30,5 +30,5 @@ navigate to the zone you want to import, and copy the id from the URL in your
 browser.
 
 ```
-terraform import hetznerdns_zone.zone1 <id>
+terraform import hetznerdns_zone.zone1 rMu2waTJPbHr4
 ```
