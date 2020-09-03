@@ -144,7 +144,8 @@ func resourceRecordUpdate(d *schema.ResourceData, m interface{}) error {
 		record.TTL = nil
 		ttl, ttlNonEmpty := d.GetOk("ttl")
 		if ttlNonEmpty {
-			record.TTL = ttl.(*int)
+			ttl := ttl.(int)
+			record.TTL = &ttl
 		}
 		record.Type = d.Get("type").(string)
 		record.Value = d.Get("value").(string)
