@@ -4,7 +4,7 @@ Provides details about a Hetzner DNS Zone.
 
 ## Example Usage
 
-```
+```hcl
 data "hetznerdns_zone" "zone1" {
 	name = "zone1.online"
 }

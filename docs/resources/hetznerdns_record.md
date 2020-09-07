@@ -4,7 +4,7 @@ Provides a Hetzner DNS Recrods resource to create, update and delete DNS Records
 
 ## Example Usage
 
-```
+```hcl
 data "hetznerdns_zone" "zone1" {
     name = "zone1.online"
 }
