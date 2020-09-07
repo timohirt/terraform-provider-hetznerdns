@@ -37,6 +37,10 @@ func dataSourceHetznerDNSZoneRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Error getting zone state. %s", err)
 	}
 
+	if zone == nil {
+		return fmt.Errorf("DNS zone '%s' doesn't exist", name.(string))
+	}
+
 	d.Set("name", zone.Name)
 	d.Set("ttl", zone.TTL)
 	d.SetId(zone.ID)
