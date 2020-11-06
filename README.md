@@ -97,3 +97,49 @@ export HETZNER_DNS_API_TOKEN=<your api token>
 
 The provider uses this token and you don't have to enter it
 anymore.
+
+### Example Usage
+
+```
+# Specify a zone for a domain (example.com)
+resource "hetznerdns_zone" "example_com" {
+  name = "example.com"
+  ttl  = 60
+}
+
+# Handle root (example.com)
+resource "hetznerdns_record" example_com_root" {
+  zone_id = hetznerdns_zone.example_com.id
+  name    = "@"
+  value   = hcloud_server.server_name.ipv4_address
+  type    = "A"
+  ttl     = 60
+}
+
+# Handle wildcard subdomain (*.example.com)
+resource "hetznerdns_record" "all_example_com" {
+  zone_id = hetznerdns_zone.example_com.id
+  name    = "*"
+  value   = hcloud_server.server_name.ipv4_address
+  type    = "A"
+  ttl     = 60
+}
+
+# Handle specific subdomain (books.example.com)
+resource "hetznerdns_record" "books_example_com" {
+  zone_id = hetznerdns_zone.example_com.id
+  name    = "books"
+  value   = hcloud_server.server_name.ipv4_address
+  type    = "A"
+  ttl     = 60
+}
+
+# Handle email (MX record with priority 10) 
+resource "hetznerdns_record" "example_com_email" {
+  zone_id = hetznerdns_zone.example_com.id
+  name    = "@"
+  value   = "10 mail.example.com"
+  type    = "MX"
+  ttl     = 60
+}
+```
