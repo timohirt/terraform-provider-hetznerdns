@@ -26,7 +26,7 @@ to use this provider.
 
 Terraform introduced the Terrafrom registry with version 0.13. This
 provider is published and available there. If you want to use it, just
-add the following to your `terraform.rf`:
+add the following to your `terraform.tf`:
 
 ```
 terraform {
