@@ -26,14 +26,14 @@ to use this provider.
 
 Terraform introduced the Terrafrom registry with version 0.13. This
 provider is published and available there. If you want to use it, just
-add the following to your `terraform.rf`:
+add the following to your `terraform.tf`:
 
-```
+```terraform
 terraform {
   required_providers {
     hetznerdns = {
       source = "timohirt/hetznerdns"
-      version = "1.0.6"
+      version = "1.1.0"
     }
   }
   required_version = ">= 0.13"
@@ -44,10 +44,10 @@ Then run `terraform init` to download the provider.
 
 ### Install and Use Provider on your Local Machine (TF >=0.13)
 
-After installing the provider as descibed in [INSTALL](./INSTALL.md), 
+After installing the provider as descibed in [INSTALL](./INSTALL.md),
 add the following to your `terraform.tf`.
 
-```
+```terraform
 terraform {
   required_providers {
     hetznerdns = {
@@ -65,13 +65,13 @@ is used to authenticate at the Hetzner DNS API.
 
 ### Enter API Token when needed
 
-You can enter it every time you run `terraform`. 
+You can enter it every time you run `terraform`.
 
 ### Configure the Provider to take the API Token from a Variable
 
 Add the following to your `terraform.tf`:
 
-```
+```terraform
 variable "hetznerdns_token" {}
 
 provider "hetznerdns" {
@@ -81,8 +81,8 @@ provider "hetznerdns" {
 
 Now, assign the your API token to `hetznerdns_token` in `terraform.tfvars`:
 
-```
-hetznerdns_token = kkd993i3kkmm4m4m4
+```terraform
+hetznerdns_token = "kkd993i3kkmm4m4m4"
 ```
 
 You don't have to enter the API token anymore.
@@ -100,7 +100,7 @@ anymore.
 
 ### Example Usage
 
-```
+```terraform
 # Specify a zone for a domain (example.com)
 resource "hetznerdns_zone" "example_com" {
   name = "example.com"
@@ -108,7 +108,7 @@ resource "hetznerdns_zone" "example_com" {
 }
 
 # Handle root (example.com)
-resource "hetznerdns_record" example_com_root" {
+resource "hetznerdns_record" "example_com_root" {
   zone_id = hetznerdns_zone.example_com.id
   name    = "@"
   value   = hcloud_server.server_name.ipv4_address
@@ -134,7 +134,7 @@ resource "hetznerdns_record" "books_example_com" {
   ttl     = 60
 }
 
-# Handle email (MX record with priority 10) 
+# Handle email (MX record with priority 10)
 resource "hetznerdns_record" "example_com_email" {
   zone_id = hetznerdns_zone.example_com.id
   name    = "@"
