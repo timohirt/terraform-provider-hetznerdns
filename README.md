@@ -33,7 +33,7 @@ terraform {
   required_providers {
     hetznerdns = {
       source = "timohirt/hetznerdns"
-      version = "1.1.0"
+      version = "1.1.1"
     }
   }
   required_version = ">= 0.13"
@@ -60,7 +60,7 @@ terraform {
 
 ## Authentication
 
-Once installed you have three ptions to provide the required API token that
+Once installed you have three options to provide the required API token that
 is used to authenticate at the Hetzner DNS API.
 
 ### Enter API Token when needed
@@ -79,7 +79,7 @@ provider "hetznerdns" {
 }
 ```
 
-Now, assign the your API token to `hetznerdns_token` in `terraform.tfvars`:
+Now, assign your API token to `hetznerdns_token` in `terraform.tfvars`:
 
 ```terraform
 hetznerdns_token = "kkd993i3kkmm4m4m4"
