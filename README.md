@@ -140,4 +140,14 @@ resource "hetznerdns_record" "example_com_email" {
   value   = "10 mail.example.com"
   type    = "MX"
 }
+
+# SPF record
+resource "hetznerdns_record" "example_com_spf" {
+  zone_id = hetznerdns_zone.example_com.id
+  name    = "@"
+  # The entire value needs to be enclosed in quotes in the zone file, if it contains a space or a quote. For Terraform, you need to escape these "inner" quotes:
+  value   = "\"v=spf1 ip4:1.2.3.4 -all\""
+  type    = "TXT"
+  ttl     = 60
+}
 ```
