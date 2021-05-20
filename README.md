@@ -113,7 +113,8 @@ resource "hetznerdns_record" "example_com_root" {
   name    = "@"
   value   = hcloud_server.server_name.ipv4_address
   type    = "A"
-  ttl     = 60
+  # You only need to set a TTL if it's different from the zone's TTL above
+  ttl     = 70
 }
 
 # Handle wildcard subdomain (*.example.com)
@@ -122,7 +123,6 @@ resource "hetznerdns_record" "all_example_com" {
   name    = "*"
   value   = hcloud_server.server_name.ipv4_address
   type    = "A"
-  ttl     = 60
 }
 
 # Handle specific subdomain (books.example.com)
@@ -131,7 +131,6 @@ resource "hetznerdns_record" "books_example_com" {
   name    = "books"
   value   = hcloud_server.server_name.ipv4_address
   type    = "A"
-  ttl     = 60
 }
 
 # Handle email (MX record with priority 10)
@@ -140,6 +139,5 @@ resource "hetznerdns_record" "example_com_email" {
   name    = "@"
   value   = "10 mail.example.com"
   type    = "MX"
-  ttl     = 60
 }
 ```
