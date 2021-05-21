@@ -150,6 +150,5 @@ resource "hetznerdns_record" "example_com_spf" {
   # Or let `jsonencode()` take care of the escaping:
   value   = jsonencode("v=spf1 ip4:1.2.3.4 -all")
   type    = "TXT"
-  ttl     = 60
 }
 ```
