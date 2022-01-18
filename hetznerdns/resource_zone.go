@@ -5,7 +5,7 @@ import (
 
 	"github.com/timohirt/terraform-provider-hetznerdns/hetznerdns/api"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceZone() *schema.Resource {
