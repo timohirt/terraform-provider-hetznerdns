@@ -6,26 +6,27 @@
 
 Read about what I learnt while [implementing this Terraform Provider](http://www.timohirt.de/blog/implementing-a-terraform-provider/).
 
-**This provider is on published on the Terraform registry**. You can find resources
-and data sources [documentation](https://registry.terraform.io/providers/timohirt/hetznerdns/latest/docs) there
-or [here](docs).
+**This provider is on published on the Terraform registry**. 
+
+You can find resources and data sources
+[documentation](https://registry.terraform.io/providers/timohirt/hetznerdns/latest/docs)
+there or [here](docs).
 
 ## Requirements
 
-- [Terraform](https://www.terraform.io/downloads.html) 0.12.x / 0.13.x
-  - Read how [insekticid](https://github.com/insekticid) migrated from 0.12 to 0.13 in this [article](https://www.exploit.cz/how-to-migrate-from-plugins-to-terraform-0-13-registry-providers/).
-- [Go](https://golang.org/) 1.14 (to build the provider plugin)
+- [Terraform](https://www.terraform.io/downloads.html) > v1.0
+- [Go](https://golang.org/) 1.16 (to build the provider plugin)
 
 ## Installing and Using this Plugin
 
+You most likely want to download the provider from [Terraform
+Registry](https://registry.terraform.io/providers/timohirt/hetznerdns/latest/docs).
 If you want or need to install the provider locally, take a look at
-[INSTALL](./INSTALL.md). For Terraform <= 0.12 this is required in order
-to use this provider.
+[INSTALL](./INSTALL.md). 
 
-### Using Provider from Terraform Registry (TF >= 0.13)
+### Using Provider from Terraform Registry (TF >= 1.0)
 
-Terraform introduced the Terrafrom registry with version 0.13. This
-provider is published and available there. If you want to use it, just
+This provider is published and available there. If you want to use it, just
 add the following to your `terraform.tf`:
 
 ```terraform
@@ -33,30 +34,14 @@ terraform {
   required_providers {
     hetznerdns = {
       source = "timohirt/hetznerdns"
-      version = "1.2.0"
+      version = "2.0.0"
     }
   }
-  required_version = ">= 0.13"
+  required_version = ">= 1.0"
 }
 ```
 
 Then run `terraform init` to download the provider.
-
-### Install and Use Provider on your Local Machine (TF >=0.13)
-
-After installing the provider as descibed in [INSTALL](./INSTALL.md),
-add the following to your `terraform.tf`.
-
-```terraform
-terraform {
-  required_providers {
-    hetznerdns = {
-      source = "github.com/timohirt/hetznerdns"
-    }
-  }
-  required_version = ">= 0.13"
-}
-```
 
 ## Authentication
 
@@ -114,7 +99,7 @@ resource "hetznerdns_record" "example_com_root" {
   value   = hcloud_server.server_name.ipv4_address
   type    = "A"
   # You only need to set a TTL if it's different from the zone's TTL above
-  ttl     = 70
+  ttl     = 300
 }
 
 # Handle wildcard subdomain (*.example.com)
