@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 // UnauthorizedError represents the message of a HTTP 401 response
@@ -44,7 +46,11 @@ func NewClient(apiToken string) (*Client, error) {
 }
 
 func (c *Client) doHTTPRequest(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
-	client := c.createHTTPClient()
+	retryableClient := retryablehttp.NewClient()
+	retryableClient.Backoff = retryablehttp.DefaultBackoff
+	retryableClient.RetryMax = 10
+	client := retryableClient.StandardClient()
+
 	log.Printf("[DEBUG] HTTP request to API %s %s", method, url)
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
