@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -47,7 +48,13 @@ func NewClient(apiToken string) (*Client, error) {
 
 func (c *Client) doHTTPRequest(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
 	retryableClient := retryablehttp.NewClient()
-	retryableClient.Backoff = retryablehttp.DefaultBackoff
+	retryableClient.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
+		ok, err := retryablehttp.DefaultRetryPolicy(ctx, resp, err)
+		if !ok && resp.StatusCode == http.StatusUnprocessableEntity {
+			return true, nil
+		}
+		return ok, err
+	}
 	retryableClient.RetryMax = 10
 	client := retryableClient.StandardClient()
 
