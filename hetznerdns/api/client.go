@@ -31,7 +31,16 @@ type ErrorMessage struct {
 type createHTTPClient func() *http.Client
 
 func defaultCreateHTTPClient() *http.Client {
-	return &http.Client{}
+	retryableClient := retryablehttp.NewClient()
+	retryableClient.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
+		ok, err := retryablehttp.DefaultRetryPolicy(ctx, resp, err)
+		if !ok && resp.StatusCode == http.StatusUnprocessableEntity {
+			return true, nil
+		}
+		return ok, err
+	}
+	retryableClient.RetryMax = 10
+	return retryableClient.StandardClient()
 }
 
 // Client for the Hetzner DNS API.
@@ -47,16 +56,7 @@ func NewClient(apiToken string) (*Client, error) {
 }
 
 func (c *Client) doHTTPRequest(apiToken string, method string, url string, body io.Reader) (*http.Response, error) {
-	retryableClient := retryablehttp.NewClient()
-	retryableClient.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
-		ok, err := retryablehttp.DefaultRetryPolicy(ctx, resp, err)
-		if !ok && resp.StatusCode == http.StatusUnprocessableEntity {
-			return true, nil
-		}
-		return ok, err
-	}
-	retryableClient.RetryMax = 10
-	client := retryableClient.StandardClient()
+	client := c.createHTTPClient()
 
 	log.Printf("[DEBUG] HTTP request to API %s %s", method, url)
 	req, err := http.NewRequest(method, url, body)
