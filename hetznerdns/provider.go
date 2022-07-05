@@ -2,7 +2,7 @@ package hetznerdns
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/timohirt/terraform-provider-hetznerdns/hetznerdns/api"
+	"github.com/timohirt/terraform-provider-hetznerdns/v2/hetznerdns/api"
 )
 
 // Provider creates and return a Terraform resource provider
