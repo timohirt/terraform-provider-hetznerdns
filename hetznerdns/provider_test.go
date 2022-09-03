@@ -7,14 +7,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-var testAccProviders map[string]*schema.Provider
-var testAccProvider *schema.Provider
+var testAccProviders map[string]func() (*schema.Provider, error)
 
 func init() {
-	testAccProvider = Provider()
-	testAccProviders = map[string]*schema.Provider{
-		"hetznerdns": testAccProvider,
+	testAccProviders = map[string]func() (*schema.Provider, error){
+		"hetznerdns": ProviderFactory,
 	}
+}
+
+func ProviderFactory() (*schema.Provider, error) {
+	return Provider(), nil
 }
 
 // See https://www.terraform.io/docs/plugins/provider.html
