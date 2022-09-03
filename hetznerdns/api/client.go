@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"io"
 	"io/ioutil"
 	"log"
@@ -51,7 +52,7 @@ type Client struct {
 }
 
 // NewClient creates a new API Client using a given api token.
-func NewClient(apiToken string) (*Client, error) {
+func NewClient(apiToken string) (*Client, diag.Diagnostics) {
 	return &Client{apiToken: apiToken, createHTTPClient: defaultCreateHTTPClient}, nil
 }
 
@@ -397,4 +398,80 @@ func (c *Client) UpdateRecord(record Record) (*Record, error) {
 	}
 
 	return nil, fmt.Errorf("Error creating Record. HTTP status %d unhandled", resp.StatusCode)
+}
+
+func (c *Client) GetPrimaryServer(id string) (*PrimaryServer, error) {
+	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/primary_servers/%s", id))
+	if err != nil {
+		return nil, fmt.Errorf("Error getting primary server %s: %s", id, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var response *PrimaryServerResponse
+		err = readAndParseJSONBody(resp, &response)
+		if err != nil {
+			return nil, fmt.Errorf("Error Reading json response of get primary server %s request: %s", id, err)
+		}
+
+		return &response.PrimaryServer, nil
+	} else if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+
+	return nil, fmt.Errorf("Error getting primary server. HTTP status %d unhandled", resp.StatusCode)
+}
+
+func (c *Client) CreatePrimaryServer(server CreatePrimaryServerRequest) (*PrimaryServer, error) {
+	reqBody := CreatePrimaryServerRequest{
+		ZoneID:  server.ZoneID,
+		Address: server.Address,
+		Port:    server.Port,
+	}
+	resp, err := c.doPostRequest("https://dns.hetzner.com/api/v1/primary_servers", reqBody)
+	if err != nil {
+		return nil, fmt.Errorf("Error creating primary server %s: %s", server.Address, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var response PrimaryServerResponse
+		err = readAndParseJSONBody(resp, &response)
+		if err != nil {
+			return nil, err
+		}
+
+		return &response.PrimaryServer, nil
+	}
+
+	return nil, fmt.Errorf("Error creating primary server. HTTP status %d unhandled", resp.StatusCode)
+}
+
+func (c *Client) UpdatePrimaryServer(server PrimaryServer) (*PrimaryServer, error) {
+	resp, err := c.doPutRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/primary_servers/%s", server.ID), server)
+	if err != nil {
+		return nil, fmt.Errorf("Error updating primary server %s: %s", server.ID, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var response PrimaryServerResponse
+		err = readAndParseJSONBody(resp, &response)
+		if err != nil {
+			return nil, err
+		}
+
+		return &response.PrimaryServer, nil
+	}
+
+	return nil, fmt.Errorf("Error updating primary server. HTTP status %d unhandled", resp.StatusCode)
+}
+
+func (c *Client) DeletePrimaryServer(id string) error {
+	resp, err := c.doDeleteRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/primary_servers/%s", id))
+	if err != nil {
+		return fmt.Errorf("Error deleting primary server %s: %s", id, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+	return fmt.Errorf("Error deleting primary server. HTTP status %d unhandled", resp.StatusCode)
 }

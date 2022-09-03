@@ -1,6 +1,8 @@
 package hetznerdns
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/timohirt/terraform-provider-hetznerdns/hetznerdns/api"
 )
@@ -18,16 +20,17 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"hetznerdns_zone":   resourceZone(),
-			"hetznerdns_record": resourceRecord(),
+			"hetznerdns_zone":           resourceZone(),
+			"hetznerdns_record":         resourceRecord(),
+			"hetznerdns_primary_server": resourcePrimaryServer(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"hetznerdns_zone": dataSourceHetznerDNSZone(),
 		},
-		ConfigureFunc: configureProvider,
+		ConfigureContextFunc: configureProvider,
 	}
 }
 
-func configureProvider(r *schema.ResourceData) (interface{}, error) {
+func configureProvider(c context.Context, r *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	return api.NewClient(r.Get("apitoken").(string))
 }
