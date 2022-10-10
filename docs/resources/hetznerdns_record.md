@@ -1,6 +1,6 @@
 # hetznerdns_record Resource
 
-Provides a Hetzner DNS Recrods resource to create, update and delete DNS Records.
+Provides a Hetzner DNS Records resource to create, update and delete DNS Records.
 
 ## Example Usage
 
