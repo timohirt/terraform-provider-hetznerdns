@@ -1,6 +1,8 @@
 package hetznerdns
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"log"
 
 	"github.com/timohirt/terraform-provider-hetznerdns/v2/hetznerdns/api"
@@ -10,12 +12,12 @@ import (
 
 func resourceZone() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceZoneCreate,
-		Read:   resourceZoneRead,
-		Update: resourceZoneUpdate,
-		Delete: resourceZoneDelete,
+		CreateContext: resourceZoneCreate,
+		ReadContext:   resourceZoneRead,
+		UpdateContext: resourceZoneUpdate,
+		DeleteContext: resourceZoneDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -32,7 +34,7 @@ func resourceZone() *schema.Resource {
 	}
 }
 
-func resourceZoneCreate(d *schema.ResourceData, m interface{}) error {
+func resourceZoneCreate(c context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Creating resource zone")
 
 	client := m.(*api.Client)
@@ -50,21 +52,21 @@ func resourceZoneCreate(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		log.Printf("[ERROR] Creating resource zone failed: %s", err)
 		d.SetId("")
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(resp.ID)
 
-	return resourceZoneRead(d, m)
+	return resourceZoneRead(c, d, m)
 }
 
-func resourceZoneRead(d *schema.ResourceData, m interface{}) error {
+func resourceZoneRead(c context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Reading resource zone")
 	client := m.(*api.Client)
 	zoneID := d.Id()
 	zone, err := client.GetZone(zoneID)
 	if err != nil {
 		log.Printf("[ERROR] Reading resource zone failed: %s", err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if zone == nil {
@@ -79,13 +81,13 @@ func resourceZoneRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceZoneUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceZoneUpdate(c context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Updating resource zone")
 	client := m.(*api.Client)
 	zoneID := d.Id()
 	zone, err := client.GetZone(zoneID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if zone == nil {
@@ -99,16 +101,16 @@ func resourceZoneUpdate(d *schema.ResourceData, m interface{}) error {
 		zone.TTL = d.Get("ttl").(int)
 		zone, err = client.UpdateZone(*zone)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
 	d.Partial(false)
 
-	return resourceZoneRead(d, m)
+	return resourceZoneRead(c, d, m)
 }
 
-func resourceZoneDelete(d *schema.ResourceData, m interface{}) error {
+func resourceZoneDelete(c context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Deleting resource zone")
 
 	client := m.(*api.Client)
@@ -117,7 +119,7 @@ func resourceZoneDelete(d *schema.ResourceData, m interface{}) error {
 	err := client.DeleteZone(zoneID)
 	if err != nil {
 		log.Printf("[ERROR] Error deleting zone %s: %s", zoneID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	return nil

@@ -20,8 +20,8 @@ func TestAccRecordResources(t *testing.T) {
 	aTTL := aZoneTTL * 2
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccAPITokenPresent(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccAPITokenPresent(t) },
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:             testAccRecordResourceConfigCreate(aZoneName, aZoneTTL, aName, aType, aValue, aTTL),
@@ -70,8 +70,8 @@ func TestAccRecordWithDefaultTTLResources(t *testing.T) {
 	aType := "A"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccAPITokenPresent(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccAPITokenPresent(t) },
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:             testAccRecordResourceConfigCreateWithDefaultTTL(aZoneName, aZoneTTL, aName, aType, aValue),
@@ -120,8 +120,8 @@ func TestAccTwoRecordResources(t *testing.T) {
 	aTTL := 60
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccAPITokenPresent(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccAPITokenPresent(t) },
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:             testAccRecordResourceConfigCreateTwo(aZoneName, aName, anotherName, aType, aValue, anotherValue, aTTL),

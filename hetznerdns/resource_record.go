@@ -1,7 +1,8 @@
 package hetznerdns
 
 import (
-	"fmt"
+	"context"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"log"
 
 	"github.com/timohirt/terraform-provider-hetznerdns/v2/hetznerdns/api"
@@ -11,12 +12,12 @@ import (
 
 func resourceRecord() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceRecordCreate,
-		Read:   resourceRecordRead,
-		Update: resourceRecordUpdate,
-		Delete: resourceRecordDelete,
+		CreateContext: resourceRecordCreate,
+		ReadContext:   resourceRecordRead,
+		UpdateContext: resourceRecordUpdate,
+		DeleteContext: resourceRecordDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -45,28 +46,28 @@ func resourceRecord() *schema.Resource {
 	}
 }
 
-func resourceRecordCreate(d *schema.ResourceData, m interface{}) error {
+func resourceRecordCreate(c context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Updating resource record")
 	client := m.(*api.Client)
 
 	zoneID, zoneIDNonEmpty := d.GetOk("zone_id")
 	if !zoneIDNonEmpty {
-		return fmt.Errorf("Zone ID of record not set")
+		return diag.Errorf("Zone ID of record not set")
 	}
 
 	name, nameNonEmpty := d.GetOk("name")
 	if !nameNonEmpty {
-		return fmt.Errorf("Name of record not set")
+		return diag.Errorf("Name of record not set")
 	}
 
 	recordType, typeNonEmpty := d.GetOk("type")
 	if !typeNonEmpty {
-		return fmt.Errorf("Type of record not set")
+		return diag.Errorf("Type of record not set")
 	}
 
 	value, valueNonEmpty := d.GetOk("value")
 	if !valueNonEmpty {
-		return fmt.Errorf("Value of record not set")
+		return diag.Errorf("Value of record not set")
 	}
 
 	opts := api.CreateRecordOpts{
@@ -85,21 +86,21 @@ func resourceRecordCreate(d *schema.ResourceData, m interface{}) error {
 	record, err := client.CreateRecord(opts)
 	if err != nil {
 		log.Printf("[ERROR] Error creating DNS record %s: %s", opts.Name, err)
-		return fmt.Errorf("Error creating DNS record %s: %s", opts.Name, err)
+		return diag.Errorf("Error creating DNS record %s: %s", opts.Name, err)
 	}
 
 	d.SetId(record.ID)
-	return resourceRecordRead(d, m)
+	return resourceRecordRead(c, d, m)
 }
 
-func resourceRecordRead(d *schema.ResourceData, m interface{}) error {
+func resourceRecordRead(c context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Reading resource record")
 	client := m.(*api.Client)
 
 	id := d.Id()
 	record, err := client.GetRecord(id)
 	if err != nil {
-		return fmt.Errorf("Error getting record with id %s: %s", id, err)
+		return diag.Errorf("Error getting record with id %s: %s", id, err)
 	}
 
 	if record == nil {
@@ -122,14 +123,14 @@ func resourceRecordRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceRecordUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceRecordUpdate(c context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Updating resource record")
 	client := m.(*api.Client)
 
 	id := d.Id()
 	record, err := client.GetRecord(id)
 	if err != nil {
-		return fmt.Errorf("Error getting record with id %s: %s", id, err)
+		return diag.Errorf("Error getting record with id %s: %s", id, err)
 	}
 
 	if record == nil {
@@ -152,14 +153,14 @@ func resourceRecordUpdate(d *schema.ResourceData, m interface{}) error {
 
 		record, err = client.UpdateRecord(*record)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
-	return resourceRecordRead(d, m)
+	return resourceRecordRead(c, d, m)
 }
 
-func resourceRecordDelete(d *schema.ResourceData, m interface{}) error {
+func resourceRecordDelete(c context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Deleting resource record")
 
 	client := m.(*api.Client)
@@ -168,7 +169,7 @@ func resourceRecordDelete(d *schema.ResourceData, m interface{}) error {
 	err := client.DeleteRecord(recordID)
 	if err != nil {
 		log.Printf("[ERROR] Error deleting record %s: %s", recordID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	return nil

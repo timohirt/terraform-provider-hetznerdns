@@ -20,8 +20,8 @@ func TestAccHcloudDataSourceDatasources(t *testing.T) {
 	aName := fmt.Sprintf("%s.online", acctest.RandString(10))
 	aTTL := 60
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccAPITokenPresent(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccAPITokenPresent(t) },
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccZoneDataSourceConfig(aName, aTTL),
