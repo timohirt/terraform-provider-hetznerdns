@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"log"
 
-	"github.com/timohirt/terraform-provider-hetznerdns/hetznerdns/api"
+	"github.com/timohirt/terraform-provider-hetznerdns/v2/hetznerdns/api"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
