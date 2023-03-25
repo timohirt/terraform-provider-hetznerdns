@@ -10,7 +10,7 @@ data "hetznerdns_zone" "zone1" {
 }
 
 resource "hetznerdns_record" "www" {
-    zone_id = hetznerdns_zone.z1.id
+    zone_id = data.hetznerdns_zone.zone1.id
     name = "www"
     value = "192.168.1.1"
     type = "A"
