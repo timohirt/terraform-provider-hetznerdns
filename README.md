@@ -151,5 +151,11 @@ resource "hetznerdns_record" "example_com_dkim" {
     jsonencode(substr(local.dkim, 255, 255)),
     ""
   ])
+  # Alternative (works even if the string is longer than 510):
+  value   = join("\"", [
+    "",
+    replace(local.dkim, "/(.{255})/", "$1\" \""),
+    " "
+  ])
 }
 ```
