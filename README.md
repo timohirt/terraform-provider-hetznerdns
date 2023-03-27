@@ -141,4 +141,20 @@ resource "hetznerdns_record" "example_com_spf" {
   value   = jsonencode("v=spf1 ip4:1.2.3.4 -all")
   type    = "TXT"
 }
+
+# DKIM record
+locals {
+  dkim = "v=DKIM1;h=sha256;k=rsa;s=email;p=abc..."}
+}
+resource "hetznerdns_record" "example_com_dkim" {
+  zone_id = hetznerdns_zone.example_com.id
+  name    = "default._domainkey"
+  type    = "TXT"
+  # Since the maximum length of a DNS record is 255, it needs to be split in 2 parts:
+  value   = join(" ", [
+    jsonencode(substr(local.dkim, 0, 255)),
+    jsonencode(substr(local.dkim, 255, 255)),
+    ""
+  ])
+}
 ```
