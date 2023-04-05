@@ -40,7 +40,7 @@ func defaultCreateHTTPClient() *http.Client {
 		}
 		return ok, err
 	}
-	retryableClient.RetryMax = 10
+	retryableClient.RetryMax = 3
 	return retryableClient.StandardClient()
 }
 
@@ -398,6 +398,27 @@ func (c *Client) UpdateRecord(record Record) (*Record, error) {
 	}
 
 	return nil, fmt.Errorf("Error creating Record. HTTP status %d unhandled", resp.StatusCode)
+}
+
+// GetRecords reads all DNS Records of a zone id
+func (c *Client) GetRecordsByZoneID(zoneID string) (*[]Record, error) {
+
+	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/records?zone_id=%s", zoneID))
+	if err != nil {
+		return nil, fmt.Errorf("Error getting records for zone_id %s: %s", zoneID, err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Error getting Records. HTTP status %d unhandled", resp.StatusCode)
+	}
+
+	var response *RecordsResponse
+	err = readAndParseJSONBody(resp, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.Records, nil
 }
 
 func (c *Client) GetPrimaryServer(id string) (*PrimaryServer, error) {

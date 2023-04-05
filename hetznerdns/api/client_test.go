@@ -193,6 +193,19 @@ func TestClientUpdateRecordSuccess(t *testing.T) {
 	assert.Equal(t, recordWithUpdatesJSON, string(jsonRequestBody))
 }
 
+func TestClientGetRecordsByZoneID(t *testing.T) {
+	aTTL := 3600
+	responseBody := []byte(`{"records":[{"zone_id":"wwwlsksjjenm","id":"12345678","name":"zone1.online","ttl":3600,"type":"A","value":"192.168.1.1"}]}`)
+	config := RequestConfig{responseHTTPStatus: http.StatusOK, responseBodyJSON: responseBody}
+	client := createTestClient(config)
+
+	records, err := client.GetRecordsByZoneID("wwwlsksjjenm")
+
+	assert.NoError(t, err)
+
+	assert.Equal(t, []Record{{ZoneID: "wwwlsksjjenm", ID: "12345678", Name: "zone1.online", TTL: &aTTL, Type: "A", Value: "192.168.1.1"}}, *records)
+}
+
 func TestClientHandleUnauthorizedRequest(t *testing.T) {
 	responseBody := []byte(`{"message":"Invalid API key"}`)
 	config := RequestConfig{responseHTTPStatus: http.StatusUnauthorized, responseBodyJSON: responseBody}
