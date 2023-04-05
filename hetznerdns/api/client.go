@@ -40,7 +40,7 @@ func defaultCreateHTTPClient() *http.Client {
 		}
 		return ok, err
 	}
-	retryableClient.RetryMax = 3
+	retryableClient.RetryMax = 10
 	return retryableClient.StandardClient()
 }
 
