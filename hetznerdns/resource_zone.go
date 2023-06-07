@@ -2,8 +2,10 @@ package hetznerdns
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"fmt"
 	"log"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 
 	"github.com/timohirt/terraform-provider-hetznerdns/hetznerdns/api"
 
@@ -46,6 +48,19 @@ func resourceZoneCreate(c context.Context, d *schema.ResourceData, m interface{}
 
 	if ttl, isOk := d.GetOk("ttl"); isOk {
 		opts.TTL = ttl.(int)
+	}
+
+	zoneExists, err := client.ZoneExistsByName(opts.Name)
+	if err != nil {
+		log.Printf("[ERROR] Checking if resource zone exists failed: %s", err)
+		d.SetId("")
+		return diag.FromErr(err)
+	}
+
+	if zoneExists {
+		errMsg := fmt.Sprintf("DNS zone with name %s already exists", opts.Name)
+		log.Printf("[ERROR] %s", errMsg)
+		return diag.Errorf(errMsg)
 	}
 
 	resp, err := client.CreateZone(opts)
