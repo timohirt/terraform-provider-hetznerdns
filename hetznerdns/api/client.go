@@ -227,6 +227,23 @@ func (c *Client) DeleteZone(id string) error {
 	return fmt.Errorf("Error deleting Zone. HTTP status %d unhandled", resp.StatusCode)
 }
 
+// ZoneExistsByName checks if a DNS zone with a given name exists
+func (c *Client) ZoneExistsByName(name string) (bool, error) {
+	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/zones?name=%s", name))
+	if err != nil {
+		return false, fmt.Errorf("Error getting zone %s: %s", name, err)
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		return false, nil
+	}
+	if resp.StatusCode == http.StatusOK {
+		return true, nil
+	}
+
+	return false, fmt.Errorf("Error getting Zone. HTTP status %d unhandled", resp.StatusCode)
+}
+
 // GetZoneByName reads the current state of a DNS zone with a given name
 func (c *Client) GetZoneByName(name string) (*Zone, error) {
 	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/zones?name=%s", name))
@@ -283,6 +300,23 @@ func (c *Client) CreateZone(opts CreateZoneOpts) (*Zone, error) {
 	}
 
 	return nil, fmt.Errorf("Error creating Zone. HTTP status %d unhandled", resp.StatusCode)
+}
+
+// RecordExistsByName checks if a DNS Record with a given name exists in a given zone
+func (c *Client) RecordExistsByName(zoneID string, name string) (bool, error) {
+	resp, err := c.doGetRequest(fmt.Sprintf("https://dns.hetzner.com/api/v1/records?zone_id=%s&name=%s", zoneID, name))
+	if err != nil {
+		return false, fmt.Errorf("Error getting record %s: %s", name, err)
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		return false, nil
+	}
+	if resp.StatusCode == http.StatusOK {
+		return true, nil
+	}
+
+	return false, fmt.Errorf("Error getting Record. HTTP status %d unhandled", resp.StatusCode)
 }
 
 // GetRecordByName reads the current state of a DNS Record with a given name and zone id
