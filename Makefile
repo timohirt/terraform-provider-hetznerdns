@@ -11,7 +11,7 @@ build:
 	go build -o $(BINARY_DIR)/$(BINARY_NAME)
 
 testacc:
-	TF_ACC=1 go test $(TEST) -v -timeout 30m
+	TF_LOG_PROVIDER=DEBUG TF_LOG=DEBUG TF_ACC=1 go test $(TEST) -v -timeout 180s
 
 test: 
 	go test $(TEST) || exit 1
