@@ -5,6 +5,7 @@ builds:
     - linux
     - darwin
     - windows
+    - freebsd
   ignore:
     - goos: darwin
       goarch: 386

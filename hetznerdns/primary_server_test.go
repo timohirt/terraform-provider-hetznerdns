@@ -9,12 +9,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+const validPublicIpAddress = "167.182.9.17"
+
 func TestAccPrimaryServerResources(t *testing.T) {
 	// aZoneName must be a valid DNS domain name with an existing TLD
 	aZoneName := fmt.Sprintf("%s.online", acctest.RandString(10))
 	aZoneTTL := 60
 
-	psAddress := "1.1.1.1"
+	psAddress := validPublicIpAddress
 	psPort := 53
 
 	resource.Test(t, resource.TestCase{
@@ -57,10 +59,10 @@ func TestAccTwoPrimaryServersResources(t *testing.T) {
 	aZoneName := fmt.Sprintf("%s.online", acctest.RandString(10))
 	aZoneTTL := 60
 
-	ps1Address := "1.1.1.1"
+	ps1Address := validPublicIpAddress
 	ps1Port := 53
 
-	ps2Address := "1.1.0.0"
+	ps2Address := "154.23.82.134"
 	ps2Port := 53
 
 	resource.Test(t, resource.TestCase{
