@@ -1,9 +1,10 @@
-
 # This project is not maintained anymore
 
 Answerings and solving issues, reviewing and merging PRs, keeping dependencies up to date is a lot of work. As I don't need Hetzner DNS anymore, I decided to not work on this project anymore and dedicate my free time to other fun activities. 
 
-Here is a fork you may want to use instead: [germanbrew/terraform-provider-hetznerdns](https://github.com/germanbrew/terraform-provider-hetznerdns)
+Feel free to create pull requests and contribute to this project. I'll be merging them and publiching new releases.
+
+Another option is this fork: [germanbrew/terraform-provider-hetznerdns](https://github.com/germanbrew/terraform-provider-hetznerdns)
 
 ## Terraform Provider for Hetzner DNS
 
