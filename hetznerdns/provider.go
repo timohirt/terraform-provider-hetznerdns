@@ -25,7 +25,8 @@ func Provider() *schema.Provider {
 			"hetznerdns_primary_server": resourcePrimaryServer(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"hetznerdns_zone": dataSourceHetznerDNSZone(),
+			"hetznerdns_zone":    dataSourceHetznerDNSZone(),
+			"hetznerdns_records": dataSourceHetznerDNSRecords(),
 		},
 		ConfigureContextFunc: configureProvider,
 	}
