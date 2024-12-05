@@ -1,3 +1,10 @@
+
+**This project is not maintained anymore. **
+
+Answerings and solving issues, reviewing and merging PRs, keeping dependencies up to date is a lot of work. As I don't need Hetzner DNS anymore, I decided to not work on this project anymore and dedicate my free time to other fun activities. 
+
+Here is a fork you may want to use instead: [germanbrew/terraform-provider-hetznerdns](https://github.com/germanbrew/terraform-provider-hetznerdns)
+
 # Terraform Provider for Hetzner DNS
 
 ![CI Build](https://github.com/timohirt/terraform-provider-hetznerdns/workflows/CI%20Build/badge.svg?branch=master)
@@ -5,8 +12,6 @@
 ![GitHub](https://img.shields.io/github/license/timohirt/terraform-provider-hetznerdns)
 
 Read about what I learnt while [implementing this Terraform Provider](http://www.timohirt.de/blog/implementing-a-terraform-provider/).
-
-**This provider is on published on the Terraform registry**. 
 
 You can find resources and data sources
 [documentation](https://registry.terraform.io/providers/timohirt/hetznerdns/latest/docs)
